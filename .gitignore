@@ -2,3 +2,4 @@ build
 dist
 skynet_ml.egg-info
 .DS_Store
+__pycache__
