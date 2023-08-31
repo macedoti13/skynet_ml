@@ -19,9 +19,11 @@ Welcome to SkyNet! This is my personal machine learning library. It is entirely 
 - **Transparency:** SkyNet's code is well-documented with detailed comments and docstrings to guide you through each part of the code.
 
 ## Installation
-Clone this repository:
+
+Install `skynet_ml` directly from PyPI:
+
 ```bash
-git clone https://github.com/macedoti13/skynet.git
+pip install skynet_ml
 ```
 
 ## Usage
@@ -73,7 +75,6 @@ model.fit(X, y)
 # predict with your model 
 model.predict(X)
 ```
-**Please refer to the testing notebooks for more detailed usage and results**
 
 ## Acknowledgements
 
