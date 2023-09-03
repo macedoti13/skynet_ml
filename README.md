@@ -23,7 +23,7 @@ Welcome to SkyNet! This is my personal machine learning library. It is entirely 
 Install `skynet_ml` directly from PyPI:
 
 ```bash
-pip install skynet_ml
+pip install skynet-ml
 ```
 
 ## Usage
@@ -46,18 +46,22 @@ cd skynet
 3. **Make Magic!:** 
 ```bash
 # import all the stuff you need 
-from nn.layers.dense import Dense
-from nn.models.sequential import Sequential
+from skynet_ml.deep.layers.dense import Dense
+from skynet_ml.deep.models.sequential import Sequential
+from skynet_ml.deep.optimizers.sgd import SGD
+from skynet_ml.deep.initializers.random import Random
 
 # initialize the model object 
 model = Sequential()
 
 # insert the layers you want
-model.add(Dense(2, 3, activation="sigmoid", has_bias=True, initialization="random"))
-model.add(Dense(3, 1, activation="sigmoid", has_bias=True, initialization="random"))
+model.add(Dense(2, 3, activation="sigmoid", has_bias=True, initializer=Random()))
+model.add(Dense(3, 3, activation="sigmoid", has_bias=True, initializer=Random()))
+model.add(Dense(3, 1, activation="linear", has_bias=True, initializer=Random()))
 
 # compile your model
-model.compile(epochs=10000, learning_rate=1, optimizer="sgd", batch_size=2, loss="mse")
+opt = SGD(learning_rate=0.01)
+model.compile(optimizer=opt, loss="mse")
 
 # create training data (features as columns)
 X = np.array([
@@ -70,7 +74,7 @@ y = np.array([
 ])
 
 # fit your model -> This is where everything goes wrong, SkyNet takes the planet and everyone dies! That's a joke, it's just calculus. 
-model.fit(X, y)
+model.fit(X, y, epochs=10000, batch_size=2)
 
 # predict with your model 
 model.predict(X)
