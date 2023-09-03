@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="skynet_ml",
-    version="0.0.4",
+    version="0.0.5",
     author="Thiago Macedo",
     author_email="thialmacedo@gmail.com",
     description="A hand made machine learning library from scratch, by Thiago Macedo",
