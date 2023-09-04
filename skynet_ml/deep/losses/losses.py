@@ -70,12 +70,10 @@ def categorical_cross_entropy(yhat: float, y: float) -> float:
 
 def d_categorical_cross_entropy(yhat: float, y: float) -> float:
     """
-    Derivative of the Categorical Cross Entropy Loss Function
+    Derivative of the Categorical Cross Entropy Loss Function when combined with softmax.
 
     Args:
         yhat (float): Prediction.
         y (float): True Label.
     """    
-    epsilon = 1e-15  # prevents division by 0
-    yhat = np.clip(yhat, epsilon, 1 - epsilon)
-    return -y / yhat
+    return yhat - y

@@ -92,7 +92,10 @@ class Dense:
         assert d_output.shape == self.a.shape, "d_output shape mismatch. Expected shape: {} but got: {}.".format(self.a.shape, d_output.shape)
 
         # calculates the delta for this layer: 
-        self.delta = np.multiply(d_output, self.d_activation(self.z))
+        if self.activation == "softmax":
+            self.delta = d_output
+        else:
+            self.delta = np.multiply(d_output, self.d_activation(self.z))
         
         # computes the gradient of the loss w.r.t weights
         self.d_weights = np.dot(self.delta, self.input_vector.T)
