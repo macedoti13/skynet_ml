@@ -1,5 +1,5 @@
 import numpy as np
-from skynet_ml.deep.initializers import initializers_map
+from skynet_ml.deep.initializers import initializers_map, activation_to_initializer_map
 from skynet_ml.deep.layers.activations import activations_map, d_activations_map
 
 class Dense:
@@ -15,7 +15,7 @@ class Dense:
     """       
     
     
-    def __init__(self, input_dim: int, output_dim: int, activation: str=None, has_bias: bool=True, initializer="random"):
+    def __init__(self, input_dim: int, output_dim: int, activation: str=None, has_bias: bool=True, initializer: str=None):
         """
         Initializes the Dense layer.
 
@@ -24,8 +24,10 @@ class Dense:
             output_dim (int): Number of neurons in this layer.
             activation (str, optional): Activation function's name. Defaults to None.
             has_bias (bool, optional): Indicator for bias units. Defaults to True.
-            initializer (str, optional): Method to initialize weights and biases. Defaults to "random".
+            initializer (str, optional): Method to initialize weights and biases. Defaults to Nones.
         """   
+        if initializer is None:
+            initializer = activation_to_initializer_map[activation]
         
         # asserts
         assert isinstance(input_dim, int) and input_dim > 0, "Input dimension must be a positive integer."
