@@ -42,7 +42,7 @@ class Dense:
             
         # initializes the weights and biases with the initializer
         self.weights = self.initializer.initialize_weights(input_dim, output_dim)
-        self.bias = self.initializer.initialize_bias(output_dim, has_bias)
+        self.bias = self.initializer.initialize_bias(input_dim, output_dim, has_bias)
         self.has_bias = has_bias
         
         # initializes the activation function and it's derivative
