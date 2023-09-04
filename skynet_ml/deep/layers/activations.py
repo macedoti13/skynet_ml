@@ -51,16 +51,32 @@ def tanh(x: float) -> float:
 
 def d_tanh(x: float) -> float:
     """
-    Derivative of the tanh function
+    Derivative of the tanh function.
     """
     return 1 - np.tanh(x)**2
+
+
+def softmax(x: np.ndarray) -> np.ndarray:
+    """
+    Softmax activation function.
+    """
+    e_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
+    return e_x / e_x.sum(axis=-1, keepdims=True)
+
+
+def d_softmax(x: np.ndarray) -> np.ndarray:
+    """
+    Derivative of the softmax function.
+    """
+    return np.diagflat(x) - np.outer(x, x)
 
 
 activations_map = {
     "linear": linear,
     "sigmoid": sigmoid,
     "relu": relu,
-    "tanh": tanh
+    "tanh": tanh,
+    "softmax": softmax
 }
 
 
@@ -68,5 +84,6 @@ d_activations_map = {
     "linear": d_linear,
     "sigmoid": d_sigmoid,
     "relu": d_relu,
-    "tanh": d_tanh
+    "tanh": d_tanh,
+    "softmax": d_softmax
 }
