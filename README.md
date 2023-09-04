@@ -46,10 +46,10 @@ cd skynet
 3. **Make Magic!:** 
 ```bash
 # import all the stuff you need 
-from skynet_ml.deep.layers.dense import Dense
-from skynet_ml.deep.models.sequential import Sequential
-from skynet_ml.deep.optimizers.sgd import SGD
-from skynet_ml.deep.initializers.random import Random
+from skynet_ml.deep.layers import Dense
+from skynet_ml.deep.models import Sequential
+from skynet_ml.deep.initializers import Random
+from skynet_ml.deep.optimizers import SGD
 
 # initialize the model object 
 model = Sequential()
