@@ -20,7 +20,7 @@ class AdaGrad:
             learning_rate (float, optional): The initial learning rate. Defaults to 0.01.
         """        
         self.learning_rate = learning_rate
-        self.epsilon = 1e-7
+        self.epsilon = 1e-7 # prevents division by zero
         
         
     def update_params(self, layer: object) -> None:
