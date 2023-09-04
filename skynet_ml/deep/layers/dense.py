@@ -45,6 +45,7 @@ class Dense:
         
         # initializes the activation function and it's derivative
         self.activation = activations_map[activation]
+        self.name_activation = activation
         self.d_activation = d_activations_map[activation]
         
         
@@ -92,7 +93,7 @@ class Dense:
         assert d_output.shape == self.a.shape, "d_output shape mismatch. Expected shape: {} but got: {}.".format(self.a.shape, d_output.shape)
 
         # calculates the delta for this layer: 
-        if self.activation == "softmax":
+        if self.name_activation == "softmax":
             self.delta = d_output
         else:
             self.delta = np.multiply(d_output, self.d_activation(self.z))
