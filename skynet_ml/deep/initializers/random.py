@@ -22,12 +22,13 @@ class Random:
         return np.random.randn(output_dim, input_dim)
     
     
-    def initialize_bias(self, output_dim: int, has_bias: bool = True) -> np.array:
+    def initialize_bias(self, intput_dim: int, output_dim: int, has_bias: bool = True) -> np.array:
         """
         Initializes the bias with random values drawn from a uniform distribution over [0, 1).
         If has_bias is False, the bias is initialized with zeros.
 
         Args:
+            input_dim (int): Number of input neurons.
             output_dim (int): Number of output neurons.
             has_bias (bool): Determines whether to include a bias term. Defaults to True.
 
