@@ -68,7 +68,8 @@ def d_softmax(x: np.ndarray) -> np.ndarray:
     """
     Derivative of the softmax function.
     """
-    return np.diagflat(x) - np.outer(x, x)
+    p = softmax(x)
+    return np.diag(p) - np.outer(p, p)
 
 
 activations_map = {
