@@ -56,12 +56,12 @@ def d_tanh(x: float) -> float:
     return 1 - np.tanh(x)**2
 
 
-def softmax(x: np.ndarray) -> np.ndarray:
+def softmax(s: np.array) -> np.array:
     """
     Softmax activation function.
     """
-    e_x = np.exp(x - np.max(x))
-    return e_x / e_x.sum(axis=-1, keepdims=True)
+    exp_s = np.exp(s - np.max(s))  
+    return exp_s / np.sum(exp_s)
 
 
 def d_softmax(x: np.ndarray) -> np.ndarray:
