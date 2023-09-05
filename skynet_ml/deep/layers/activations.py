@@ -58,25 +58,32 @@ def d_tanh(x: float) -> float:
 
 def softmax(s: np.array) -> np.array:
     """
-    Softmax activation function.
-    """
-    exp_s = np.exp(s - np.max(s))  
-    return exp_s / np.sum(exp_s)
+    Softmax Activation function.
+    """    
+    exp_s = np.exp(s - np.max(s, axis=0))
+    return exp_s / np.sum(exp_s, axis=0)
 
 
-def d_softmax(z: np.array) -> np.array:
+def d_softmax_dummy(z: np.array) -> np.array:
     """
-    Derivative of the softmax function.
+    This is a "dummy" derivative function for the softmax activation. When combined with the Categorical Cross-Entropy 
+    (CCE) loss, the need to compute the explicit derivative of the softmax function is eliminated. This is due to the 
+    unique mathematical interaction between the softmax and CCE that simplifies their combined derivative to just 
+    yhat - y, where yhat is the softmax output and y is the true label.
+
+    In our backpropagation process, we multiply the gradient of the loss with respect to the output (d_output) by the 
+    derivative of the activation function. However, in the case of softmax + CCE, this multiplication effectively 
+    becomes a no-op. To maintain a consistent interface in our code without introducing special conditions for softmax, 
+    this dummy derivative function is introduced, which just returns ones. This ensures that the element-wise 
+    multiplication in the backward function becomes neutral when using softmax activation.
+
+    Args:
+        z (np.array): The pre-activation values. Not used in this dummy function but kept for interface consistency.
+
+    Returns:
+        np.array: A matrix of ones with the same shape as z.
     """
-    n, batch_size = z.shape
-    gradient = np.zeros_like(z)
-    
-    for i in range(batch_size):
-        zi = z[:, i] 
-        pi = softmax(zi)
-        gradient[:, i] = pi * (1 - pi)  
-    
-    return gradient
+    return np.ones_like(z)
 
 
 activations_map = {
@@ -93,5 +100,5 @@ d_activations_map = {
     "sigmoid": d_sigmoid,
     "relu": d_relu,
     "tanh": d_tanh,
-    "softmax": d_softmax
+    "softmax": d_softmax_dummy
 }
