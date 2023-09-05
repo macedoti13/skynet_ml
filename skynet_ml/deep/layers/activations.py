@@ -64,12 +64,19 @@ def softmax(s: np.array) -> np.array:
     return exp_s / np.sum(exp_s)
 
 
-def d_softmax(x: np.ndarray) -> np.ndarray:
+def d_softmax(z: np.array) -> np.array:
     """
     Derivative of the softmax function.
     """
-    p = softmax(x)
-    return np.diag(p) - np.outer(p, p)
+    n, batch_size = z.shape
+    gradient = np.zeros_like(z)
+    
+    for i in range(batch_size):
+        zi = z[:, i] 
+        pi = softmax(zi)
+        gradient[:, i] = pi * (1 - pi)  
+    
+    return gradient
 
 
 activations_map = {
