@@ -60,7 +60,7 @@ def softmax(x: np.ndarray) -> np.ndarray:
     """
     Softmax activation function.
     """
-    e_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
+    e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum(axis=-1, keepdims=True)
 
 
