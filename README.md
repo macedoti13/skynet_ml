@@ -46,38 +46,49 @@ cd skynet
 3. **Make Magic!:** 
 ```bash
 # import all the stuff you need 
-from skynet_ml.deep.layers import Dense
-from skynet_ml.deep.models import Sequential
-from skynet_ml.deep.initializers import Random
-from skynet_ml.deep.optimizers import SGD
+import numpy as np
+from keras.datasets import mnist
+from keras.utils import to_categorical
+from skynet_ml.nn.models.sequential import Sequential
+from skynet_ml.nn.layers import Dense
+from skynet_ml.utils import save_model, plot_training_history
 
-# initialize the model object 
+# read the mnist dataset
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+
+num_labels = len(np.unique(y_train))
+y_train = to_categorical(y_train)
+y_test = to_categorical(y_test)
+image_size = x_train.shape[1]
+input_size = image_size**2
+
+x_train = np.reshape(x_train, [-1, input_size])
+x_train = x_train.astype('float32') / 255
+x_test = np.reshape(x_test, [-1, input_size])
+x_test = x_test.astype('float32') / 255
+
+# create the model
 model = Sequential()
 
-# insert the layers you want
-model.add(Dense(2, 3, activation="sigmoid", has_bias=True, initializer=Random()))
-model.add(Dense(3, 3, activation="sigmoid", has_bias=True, initializer=Random()))
-model.add(Dense(3, 1, activation="linear", has_bias=True, initializer=Random()))
+# add layers to the mdoel
+model.add(Dense(n_units=16, activation="relu", input_dim=input_size))
+model.add(Dense(n_units=16, activation="relu"))
+model.add(Dense(n_units=num_labels, activation="softmax"))
 
-# compile your model
-opt = SGD(learning_rate=0.01)
-model.compile(optimizer=opt, loss="mse")
+# compile the model
+model.compile(loss="categorical_crossentropy", optimizer="sgd", learning_rate=0.0001)
 
-# create training data (features as columns)
-X = np.array([
-    np.array([0.5, 0.2]),
-    np.array([0.1, 0.6])
-])
+# fit your model
+model.fit(xtrain=x_train, ytrain=y_train, xval=x_test, yval=y_test, metrics=["accuracy", "precision", "recall", "f1"], epochs=20, batch_size=32, save_training_history_in="mnist_model_history.csv")
 
-y = np.array([
-    np.array([0.7, 0.8])
-])
+# save the model 
+save_model(model, "mnist_model.pkl")
 
-# fit your model -> This is where everything goes wrong, SkyNet takes the planet and everyone dies! That's a joke, it's just calculus. 
-model.fit(X, y, epochs=10000, batch_size=2)
+# plot the training history
+plot_training_history("mnist_model_history.csv", save_in="mnist_model_history.png")
 
-# predict with your model 
-model.predict(X)
+# predict with the model
+yhat = model.predict(x_test)
 ```
 
 ## Acknowledgements
