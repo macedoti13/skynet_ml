@@ -485,6 +485,29 @@ class Sequential:
         return yhat_labels
     
     
+    def evaluate(self, x: np.array, y: np.array, metrics: Optional[List[Union[str, Metric]]] = None) -> dict:
+        """
+        Evaluates the model on the given data.
+
+        Parameters:
+        - x, y (np.array): Data and labels.
+        - metrics (list, optional): Metrics to compute.
+
+        Returns:
+        - dict: Dictionary containing the computed metrics.
+        """
+        metrics = [METRICS_MAP[metric]() if isinstance(metric, str) else metric for metric in metrics] if metrics else None
+        loss = self.loss.compute(self.forward(x), y)
+        metrics_dict = {"loss": loss}
+        
+        if metrics:
+            for metric in metrics:
+                metric_value = metric.compute(self.forward(x), y)
+                metrics_dict[metric.name] = metric_value
+                
+        return metrics_dict
+    
+    
     def get_weights(self) -> List[np.array]:
         """
         Retrieves the weights of all the layers in the network.
