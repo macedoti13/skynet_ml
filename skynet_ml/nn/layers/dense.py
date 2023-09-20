@@ -169,4 +169,6 @@ class Dense(Layer):
             "initializer": self.initializer,
             "input_dim": self.input_dim,
             "has_bias": self.has_bias,
+            "activation_name": self.activation.name,
+            "initialize_name": self.initializer.name,
         }

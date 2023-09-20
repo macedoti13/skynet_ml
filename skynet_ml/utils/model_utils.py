@@ -57,12 +57,42 @@ def load_model(filename: str):
     return model
 
 
-def plot_model(model):
+def plot_model(model, save_in=None):
+    """
+    Plots the model architecture as a graph.
+    """
+    i = 1
+    output_str = ''
+
     for layer in model.layers:
         layer_config = layer.get_config()
-        for item in layer_config.items():
-            print(item)
-        print()
+        
+        layer_type = layer_config["name"]
+        units = layer_config["units"]
+        activation = layer_config["activation_name"]
+        initializer = layer_config["initialize_name"]
+        has_bias = layer_config["has_bias"]
+        input_dim = layer_config["input_dim"]
+        
+        item = tuple([layer_type, units, activation, initializer, has_bias, input_dim])
+        str1 = "Layer " + str(i) + "\n | Layer Type: {:<10}\n | Units: {:<10}\n | Activation: {:<10}\n | Initializer: {:<10}\n | Has Bias: {:<10}\n | Input Dim: {:<10}\n".format(*item)
+        
+        output_str += str1
+        
+        i += 1
+        
+        if layer == model.layers[-1]:
+            break
+        
+        arrow_str = '       |\n       |\n       |\n       V\n\n'
+        output_str += arrow_str
+
+    # Decide if you want to print or save to a file based on the save_in parameter
+    if save_in:
+        with open(save_in, 'w') as f:
+            f.write(output_str)
+    else:
+        print(output_str)
 
 
 def create_layer_from_config(layer_config):
@@ -98,7 +128,9 @@ def create_layer_from_config(layer_config):
             activation=activation,
             initializer=layer_config["initializer"],
             has_bias=layer_config["has_bias"],
-            input_dim=layer_config.get("input_shape") 
+            input_dim=layer_config.get("input_shape"),
+            activation_name=layer_config["activation_name"],
+            initialize_name=layer_config["initialize_name"]
         )
     # TODO: Add cases for other layer types as needed.
     
