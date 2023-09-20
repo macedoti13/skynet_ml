@@ -39,6 +39,7 @@ class LeakyReLUActivation(Activation):
             The slope coefficient for negative values. Default value is 0.01.
         """
         self.alpha = alpha
+        self.name == "LeakyReLU"
 
 
     def compute(self, z: np.array) -> np.array:

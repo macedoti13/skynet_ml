@@ -16,6 +16,12 @@ class HeNormalInitializer(Initializer):
         with mean of 0 and variance 2 divided by the number of input units.
 
     """
+    def __init__(self) -> None:
+        """
+        Initialize the HeNormalInitializer class.
+        """
+        self.name = "He Normal"
+        
     
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         """
@@ -53,6 +59,12 @@ class HeUniformInitializer(Initializer):
         Generate and return weights initialized uniformly based on He initialization.
 
     """
+    def __init__(self) -> None:
+        """
+        Initialize the HeUniformInitializer class.
+        """
+        self.name = "He Uniform"
+        
     
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         """

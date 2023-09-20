@@ -49,6 +49,7 @@ class SoftmaxActivation(Activation):
             Cross Entropy loss.
         """
         self.with_cross_entropy = with_cross_entropy
+        self.name = "Softmax"
         
         
     def compute(self, z: np.array) -> np.array:

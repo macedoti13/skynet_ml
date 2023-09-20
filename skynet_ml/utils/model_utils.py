@@ -57,6 +57,14 @@ def load_model(filename: str):
     return model
 
 
+def plot_model(model):
+    for layer in model.layers:
+        layer_config = layer.get_config()
+        for item in layer_config.items():
+            print(item)
+        print()
+
+
 def create_layer_from_config(layer_config):
     """
     Create a layer instance based on its configuration dictionary.

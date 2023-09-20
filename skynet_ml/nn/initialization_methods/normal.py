@@ -39,6 +39,7 @@ class NormalInitializer(Initializer):
         """
         self.mean = mean
         self.std = std
+        self.name = "Normal"
         
     
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:

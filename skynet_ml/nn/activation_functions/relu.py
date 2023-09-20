@@ -26,6 +26,12 @@ class ReLUActivation(Activation):
         Compute the derivative of the ReLU activation function for a given input.
 
     """
+    def __init__(self) -> None:
+        """
+        Initialize the ReLUActivation class.
+        """
+        self.name = "ReLU"
+
 
     def compute(self, z: np.array) -> np.array:
         """

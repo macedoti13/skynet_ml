@@ -40,6 +40,7 @@ class ConstantInitializer(Initializer):
             The value to which all weights will be initialized. Default is 1.0.
         """
         self.constant = constant
+        self.name = "Constant"
         
         
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:

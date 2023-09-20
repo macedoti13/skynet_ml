@@ -16,6 +16,12 @@ class XavierNormalInitializer(Initializer):
         with mean of 0 and variance 2 divided by the number of input units.
 
     """
+    def __init__(self) -> None:
+        """
+        Initialize the XavierNormalInitializer class.
+        """
+        self.name = "Xavier Normal"
+        
     
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         """
@@ -53,6 +59,12 @@ class XavierUniformInitializer(Initializer):
         Generate and return weights initialized uniformly based on Xavier initialization.
 
     """
+    def __init__(self) -> None:
+        """
+        Initialize the XavierUniformInitializer class.
+        """
+        self.name = "Xavier Uniform"
+        
     
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         """

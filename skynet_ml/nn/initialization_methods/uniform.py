@@ -42,6 +42,7 @@ class UniformInitializer(Initializer):
         """
         self.low_limit = low_limit
         self.high_limit = high_limit
+        self.name = "Uniform"
         
         
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:

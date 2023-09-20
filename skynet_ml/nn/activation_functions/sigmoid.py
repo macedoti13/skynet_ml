@@ -25,6 +25,12 @@ class SigmoidActivation(Activation):
         Compute the derivative of the sigmoid activation function for a given input.
 
     """
+    def __init__(self) -> None:
+        """
+        Initialize the SigmoidActivation class.
+        """
+        self.name = "Sigmoid"
+        
 
     def compute(self, z: np.array) -> np.array:
         """
