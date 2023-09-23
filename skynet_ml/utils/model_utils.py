@@ -2,7 +2,9 @@ import joblib
 from skynet_ml.utils._activation_factory import ActivationFactory
 from skynet_ml.nn.activation_functions.activation import Activation
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
+
 
 
 def save_model(model, filename: str) -> None:
@@ -33,6 +35,7 @@ def save_model(model, filename: str) -> None:
     joblib.dump(model_data, filename)
     
     
+    
 def load_model(filename: str):
     """
     Loads a neural network model from a specified filename.
@@ -55,6 +58,7 @@ def load_model(filename: str):
     model.set_weights(model_data["weights"])
     
     return model
+
 
 
 def plot_model(model, save_in=None):
@@ -93,6 +97,7 @@ def plot_model(model, save_in=None):
             f.write(output_str)
     else:
         print(output_str)
+
 
 
 def create_layer_from_config(layer_config):
@@ -135,6 +140,18 @@ def create_layer_from_config(layer_config):
     # TODO: Add cases for other layer types as needed.
     
     raise ValueError(f"Unsupported layer name: {layer_config['name']}")
+
+
+
+def _create_confusion_matrix(yhat: np.array, y_true: np.array) -> np.array:
+    pass
+
+
+
+def plot_confusion_matrix(yhat: np.array, y_true: np.array) -> None:
+    confusion_matrix = _create_confusion_matrix(yhat, y_true)
+    pass
+
 
 
 def plot_training_history(file_name, save_in=None):
