@@ -123,6 +123,7 @@ def plot_model(model, save_in=None):
     if save_in:
         with open(save_in, 'w') as f:
             f.write(output_str)
+        print(output_str)
     else:
         print(output_str)
         
