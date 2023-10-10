@@ -1,7 +1,6 @@
 from skynet_ml.utils.factories import ActivationsFactory, InitializersFactory
 import joblib
 import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
 
 
