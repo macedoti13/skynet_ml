@@ -25,9 +25,15 @@ INITIALIZERS_MAP = {
 
 ACTIVATIONS_INITIALIZER_MAP = {
     'relu': 'he_normal',
+    'ReLU': 'he_normal',
     'leaky_relu': 'he_normal',
+    'LeakyReLU': 'he_normal',
     'sigmoid': 'xavier_normal',
+    'Sigmoid': 'xavier_normal',
     'tanh': 'xavier_normal',
+    'Tanh': 'xavier_normal',
     'softmax': 'xavier_uniform',
+    'Softmax': 'xavier_uniform',
     'linear': 'xavier_normal',
+    'Linear': 'xavier_normal'
 }
