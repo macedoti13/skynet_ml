@@ -1,55 +1,74 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
+
 class Regularizer(ABC):
     """
-    Base class for Regularizers.
+    Abstract Base Class for Regularization techniques.
 
-    Regularization techniques are pivotal in training neural networks, particularly
-    in preventing overfitting. Overfitting happens when a neural network model 
-    performs exceptionally well on training data but fails to generalize on new, 
-    unseen data. One common reason is the magnitude of the coefficients (weights) 
-    becoming too large. Regularizers add a penalty to the loss function based on 
-    the size or complexity of the weights, discouraging them from reaching large values.
-
-    A regularizer will provide two main methods: 
-    - `forward`: Computes the regularization loss.
-    - `backward`: Computes the gradient of the regularization with respect to the weights.
+    The Regularizer class is an abstract class that defines the basic interface
+    that all regularizers must implement. Regularizers are techniques used to impose
+    constraints on the weights during training, helping to mitigate overfitting.
 
     Parameters
     ----------
     lambda_val : float, optional
-        Regularization strength parameter. Determines the amount of regularization 
-        to apply, with higher values meaning more regularization. Default is 0.0001.
+        Regularization factor. Higher values of lambda_val impose more regularization.
+        Default value is 0.0001.
 
     Methods
     -------
-    forward(weights: np.array) -> np.array:
-        Compute the regularization term for the provided weights.
-
+    forward(weights: np.array) -> float:
+        Compute the regularization penalty for the given weights.
+    
     backward(weights: np.array) -> np.array:
-        Compute the gradient of the regularization term with respect to the weights.
+        Compute the gradient of the regularization penalty with respect to the weights.
+    
+    get_config() -> dict:
+        Returns a dictionary containing the configuration of the regularizer.
 
+    Notes
+    -----
+    - Subclasses should implement the `forward`, `backward` and `get_config` methods.
+
+    Example
+    -------
+    >>> class L2Regularizer(Regularizer):
+    ...     def forward(self, weights):
+    ...         return self.lambda_val * np.sum(weights ** 2)
+    ...     def backward(self, weights):
+    ...         return 2 * self.lambda_val * weights
+    ...     def get_config(self):
+    ...         return {"lambda_val": self.lambda_val}
     """
+    
 
     def __init__(self, lambda_val: float = 0.0001):
+        """
+        Initializes the Regularizer with a specified lambda value.
+
+        Parameters
+        ----------
+        lambda_val : float, optional
+            The regularization factor, default is 0.0001.
+        """
         self.lambda_val = lambda_val
         
         
     @abstractmethod
     def forward(self, weights: np.array) -> float:
         """
-        Compute the regularization term for the provided weights.
+        Compute the regularization penalty for the given weights.
 
         Parameters
         ----------
         weights : np.array
-            The weights of a particular layer in the neural network.
+            The weights for which the regularization penalty is to be computed.
 
         Returns
         -------
-        float:
-            Regularization term based on the provided weights.
+        float
+            The computed regularization penalty.
         """
         pass
         
@@ -57,16 +76,36 @@ class Regularizer(ABC):
     @abstractmethod
     def backward(self, weights: np.array) -> np.array:
         """
-        Compute the gradient of the regularization term with respect to the weights.
+        Compute the gradient of the regularization penalty with respect to the weights.
 
         Parameters
         ----------
         weights : np.array
-            The weights of a particular layer in the neural network.
+            The weights for which the gradient of the regularization penalty is to be computed.
 
         Returns
         -------
         np.array
-            Gradient of the regularization term with respect to the provided weights.
+            The gradient of the regularization penalty with respect to the weights.
         """
         pass
+
+
+    @classmethod
+    def get_config(self) -> dict:
+        """
+        Returns a dictionary containing the configuration of the regularizer.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the configuration of the regularizer.
+
+        Example
+        -------
+        >>> reg = L2Regularizer(lambda_val=0.01)
+        >>> config = reg.get_config()
+        >>> print(config)
+        {'lambda_val': 0.01}
+        """
+        return {}

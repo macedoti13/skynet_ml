@@ -2,6 +2,7 @@
 from skynet_ml.nn.layers.layer import Layer
 from abc import ABC, abstractmethod
 
+
 class Optimizer(ABC):
     """
     Base class for optimization algorithms used in training neural network models.
@@ -21,6 +22,7 @@ class Optimizer(ABC):
     - step(layers) -> None: 
         Iterates through each layer and applies the update.
     """
+    
     
     def __init__(self, learning_rate: float = 0.01) -> None:
         self.learning_rate = learning_rate
@@ -50,3 +52,14 @@ class Optimizer(ABC):
         """
         for layer in layers:
             self.update(layer)
+
+
+    @classmethod
+    def get_config(self) -> dict:
+        """
+        Returns a dictionary containing the configuration of the optimizer.
+
+        Returns:
+        - config (dict): Configuration of the optimizer.
+        """
+        return {}

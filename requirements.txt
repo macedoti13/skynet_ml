@@ -2,3 +2,5 @@ numpy
 joblib
 pandas
 plotly
+matplotlib
+seabron

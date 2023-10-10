@@ -1,7 +1,7 @@
 from skynet_ml.nn.optimizers.optimizer import Optimizer
 from skynet_ml.nn.layers.layer import Layer
 
-class StochasticGradientDescent(Optimizer):
+class SGD(Optimizer):
     """
     Stochastic Gradient Descent (SGD) optimization algorithm.
 
@@ -30,6 +30,7 @@ class StochasticGradientDescent(Optimizer):
         algorithm.
     """
     
+    
     def update(self, layer: Layer) -> None:
         """
         Updates the weights of the provided layer using the SGD optimization algorithm.
@@ -40,7 +41,17 @@ class StochasticGradientDescent(Optimizer):
         Note:
         If the layer has biases, they will be updated as well.
         """
-        layer.weights -= self.learning_rate * layer.dweights
+        layer.weights -= self.learning_rate * layer.d_weights
         
         if layer.has_bias:
-            layer.weights -= self.learning_rate * layer.dbiases
+            layer.bias -= self.learning_rate * layer.d_bias
+
+
+    def get_config(self) -> dict:
+        """
+        Returns a dictionary containing the configuration of the optimizer.
+
+        Returns:
+        - config (dict): Configuration of the optimizer.
+        """
+        return {'learning_rate': self.learning_rate}

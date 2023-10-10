@@ -1,0 +1,1 @@
+from skynet_ml.nn.models.sequential import Sequential

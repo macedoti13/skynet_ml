@@ -2,6 +2,7 @@ from skynet_ml.nn.optimizers.optimizer import Optimizer
 from skynet_ml.nn.layers.layer import Layer
 import numpy as np
 
+
 class Adam(Optimizer):
     """
     Adam (Adaptive Moment Estimation) optimization algorithm.
@@ -22,7 +23,7 @@ class Adam(Optimizer):
     Methods
     -------
     update(layer: Layer) -> None:
-        Updates the weights and biases of the provided layer using the Adam algorithm.
+        Updates the weights and bias of the provided layer using the Adam algorithm.
 
     _update_m(layer: Layer) -> None:
         Internal helper method to update the moving average of gradients for a layer.
@@ -30,18 +31,19 @@ class Adam(Optimizer):
     _update_v(layer: Layer) -> None:
         Internal helper method to update the moving average of squared gradients for a layer.
 
-    _correct_mbiases(layer: Layer) -> float:
-        Compute bias-corrected moving average of gradients for biases.
+    _correct_m_bias(layer: Layer) -> float:
+        Compute bias-corrected moving average of gradients for bias.
 
-    _correct_mweights(layer: Layer) -> float:
+    _correct_m_weights(layer: Layer) -> float:
         Compute bias-corrected moving average of gradients for weights.
 
-    _correct_vbiases(layer: Layer) -> float:
-        Compute bias-corrected moving average of squared gradients for biases.
+    _correct_v_bias(layer: Layer) -> float:
+        Compute bias-corrected moving average of squared gradients for bias.
 
-    _correct_vweights(layer: Layer) -> float:
+    _correct_v_weights(layer: Layer) -> float:
         Compute bias-corrected moving average of squared gradients for weights.
     """
+    
     
     def __init__(self, learning_rate: float = 0.01, beta1: float = 0.9, beta2: float = 0.999) -> None:
         super().__init__(learning_rate)
@@ -50,31 +52,47 @@ class Adam(Optimizer):
         self.t = 0 # timestep
         
         
+    def get_config(self) -> dict:
+        """
+        Returns a dictionary containing the configuration of the optimizer.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the configuration of the optimizer.
+        """
+        return {
+            'learning_rate': self.learning_rate,
+            'beta1': self.beta1,
+            'beta2': self.beta2
+        }
+        
+        
     def update(self, layer: Layer) -> None: 
         """
-        Update the weights and biases of the provided layer using the Adam optimization algorithm.
+        Update the weights and bias of the provided layer using the Adam optimization algorithm.
 
         Parameters
         ----------
         layer : Layer
-            The neural network layer whose weights and biases need to be updated.
+            The neural network layer whose weights and bias need to be updated.
         """
         epsilon = 1e-15 
         self.t += 1 # increment timestep
         
-        self._update_m(layer) # update m for weights and biases
-        self._update_v(layer) # update v for weights and biases
+        self._update_m(layer) # update m for weights and bias
+        self._update_v(layer) # update v for weights and bias
         
-        mweights_corrected = self._correct_mweights(layer) # correct m for weights 
-        vweights_corrected = self._correct_vweights(layer) # correct v for weights
+        m_weights_corrected = self._correct_m_weights(layer) # correct m for weights 
+        v_weights_corrected = self._correct_v_weights(layer) # correct v for weights
         
-        layer.weights -= self.learning_rate * mweights_corrected / (np.sqrt(vweights_corrected) + epsilon) # update weights
+        layer.weights -= self.learning_rate * m_weights_corrected / (np.sqrt(v_weights_corrected) + epsilon) # update weights
         
         if layer.has_bias:
-            mbiases_corrected = self._correct_mbiases(layer) # correct m for biases
-            vbiases_corrected = self._correct_vbiases(layer) # correct v for biases
+            m_bias_corrected = self._correct_m_bias(layer) # correct m for bias
+            v_bias_corrected = self._correct_v_bias(layer) # correct v for bias
             
-            layer.biases -= self.learning_rate * mbiases_corrected / (np.sqrt(vbiases_corrected) + epsilon) # update biases
+            layer.bias -= self.learning_rate * m_bias_corrected / (np.sqrt(v_bias_corrected) + epsilon) # update bias
             
             
     def _update_m(self, layer: Layer) -> None:
@@ -87,13 +105,13 @@ class Adam(Optimizer):
             The neural network layer for which the moving average of gradients is updated.
         """
         
-        if not hasattr(layer, 'mweights'):
-            layer.initialize_m() # initialize mweights and mbiases if they don't exist
+        if not hasattr(layer, 'm_weights'):
+            layer.initialize_momentum() # initialize m_weights and m_bias if they don't exist
             
-        layer.mweights = self.beta1 * layer.mweights + (1 - self.beta1) * layer.dweights # update m for weights
+        layer.m_weights = self.beta1 * layer.m_weights + (1 - self.beta1) * layer.d_weights # update m for weights
         
         if layer.has_bias:
-            layer.mbiases = self.beta1 * layer.mbiases + (1 - self.beta1) * layer.mbiases  # update m for biases
+            layer.m_bias = self.beta1 * layer.m_bias + (1 - self.beta1) * layer.m_bias  # update m for bias
             
             
     def _update_v(self, layer: Layer) -> None:
@@ -106,33 +124,33 @@ class Adam(Optimizer):
             The neural network layer for which the moving average of squared gradients is updated.
         """
         
-        if not hasattr(layer, 'vweights'):
-            layer.initialize_v()
+        if not hasattr(layer, 'v_weights'):
+            layer.initialize_velocity()
             
-        layer.vweights = self.beta2 * layer.vweights + (1 - self.beta2) * layer.dweights ** 2 # update v for weights
+        layer.v_weights = self.beta2 * layer.v_weights + (1 - self.beta2) * layer.d_weights ** 2 # update v for weights
         
         if layer.has_bias:
-            layer.vbiases = self.beta2 * layer.vbiases + (1 - self.beta2) * layer.dbiases ** 2 # update v for biases
+            layer.v_bias = self.beta2 * layer.v_bias + (1 - self.beta2) * layer.d_bias ** 2 # update v for bias
             
             
-    def _correct_mbiases(self, layer: Layer) -> None:
+    def _correct_m_bias(self, layer: Layer) -> None:
         """
-        Compute and return the bias-corrected moving average of gradients for biases of the provided layer.
+        Compute and return the bias-corrected moving average of gradients for bias of the provided layer.
 
         Parameters
         ----------
         layer : Layer
-            The neural network layer for which the bias-corrected moving average of gradients for biases is computed.
+            The neural network layer for which the bias-corrected moving average of gradients for bias is computed.
 
         Returns
         -------
         float
-            The bias-corrected moving average of gradients for biases.
+            The bias-corrected moving average of gradients for bias.
         """
-        return layer.mbiases / (1 - self.beta1 ** self.t) # correct m for biases
+        return layer.m_bias / (1 - self.beta1 ** self.t) # correct m for bias
     
     
-    def _correct_mweights(self, layer: Layer) -> None:
+    def _correct_m_weights(self, layer: Layer) -> None:
         """
         Compute and return the bias-corrected moving average of gradients for weights of the provided layer.
 
@@ -146,27 +164,27 @@ class Adam(Optimizer):
         float
             The bias-corrected moving average of gradients for weights.
         """
-        return layer.mweights / (1 - self.beta1 ** self.t) # correct m for weights
+        return layer.m_weights / (1 - self.beta1 ** self.t) # correct m for weights
     
     
-    def _correct_vbiases(self, layer: Layer) -> None:
+    def _correct_v_bias(self, layer: Layer) -> None:
         """
-        Compute and return the bias-corrected moving average of squared gradients for biases of the provided layer.
+        Compute and return the bias-corrected moving average of squared gradients for bias of the provided layer.
 
         Parameters
         ----------
         layer : Layer
-            The neural network layer for which the bias-corrected moving average of squared gradients for biases is computed.
+            The neural network layer for which the bias-corrected moving average of squared gradients for bias is computed.
 
         Returns
         -------
         float
-            The bias-corrected moving average of squared gradients for biases.
+            The bias-corrected moving average of squared gradients for bias.
         """
-        return layer.vbiases / (1 - self.beta2 ** self.t) # correct v for biases
+        return layer.v_bias / (1 - self.beta2 ** self.t) # correct v for bias
     
     
-    def _correct_vweights(self, layer: Layer) -> None:
+    def _correct_v_weights(self, layer: Layer) -> None:
         """
         Compute and return the bias-corrected moving average of squared gradients for weights of the provided layer.
 
@@ -180,4 +198,4 @@ class Adam(Optimizer):
         float
             The bias-corrected moving average of squared gradients for weights.
         """
-        return layer.vweights / (1 - self.beta2 ** self.t) # correct v for weights
+        return layer.v_weights / (1 - self.beta2 ** self.t) # correct v for weights

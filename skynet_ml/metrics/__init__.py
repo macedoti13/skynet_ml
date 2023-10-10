@@ -1,18 +1,21 @@
-from skynet_ml.metrics.mse import MseMetric
-from skynet_ml.metrics.rsquared import RSquaredMetric
-from skynet_ml.metrics.accuracy import AccuracyMetric
-from skynet_ml.metrics.precision import PrecisionMetric
-from skynet_ml.metrics.recall import RecallMetric
-from skynet_ml.metrics.fscore import FScoreMetric
+from skynet_ml.metrics.classification.accuracy import Accuracy
+from skynet_ml.metrics.classification.precision import Precision
+from skynet_ml.metrics.classification.recall import Recall
+from skynet_ml.metrics.classification.fscore import FScore
+from skynet_ml.metrics.classification.confusion_matrix import ConfusionMatrix
+from skynet_ml.metrics.regression.mae import MAE
+from skynet_ml.metrics.regression.mse import MSE
+from skynet_ml.metrics.regression.rmse import RMSE
+from skynet_ml.metrics.regression.rsquared import RSquared
+
 
 METRICS_MAP = {
-    "mse": MseMetric,
-    "mean_squared_error": MseMetric,
-    "rsquared": RSquaredMetric,
-    "r2": RSquaredMetric,
-    "accuracy": AccuracyMetric,
-    "precision": PrecisionMetric,
-    "recall": RecallMetric,
-    "f1score": FScoreMetric,
-    "f1": FScoreMetric,
+    "accuracy": Accuracy,
+    "precision": Precision,
+    "recall": Recall,
+    "fscore": FScore,
+    "mae": MAE, 
+    "mse": MSE,
+    "rmse": RMSE,
+    "rsquared": RSquared
 }

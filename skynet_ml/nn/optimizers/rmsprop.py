@@ -2,6 +2,7 @@ from skynet_ml.nn.optimizers.optimizer import Optimizer
 from skynet_ml.nn.layers.layer import Layer
 import numpy as np
 
+
 class RMSProp(Optimizer):
     """
     Root Mean Square Propagation (RMSProp) optimization algorithm.
@@ -18,11 +19,12 @@ class RMSProp(Optimizer):
     Methods
     -------
     update(layer: Layer) -> None:
-        Updates the weights and biases of the provided layer using the RMSProp algorithm.
+        Updates the weights and bias of the provided layer using the RMSProp algorithm.
     
     _update_v(layer: Layer) -> None:
         Internal helper method to update the moving average of squared gradients for a layer.
     """
+
     
     def __init__(self, learning_rate: float = 0.01, beta: float = 0.9) -> None:
         """
@@ -37,11 +39,23 @@ class RMSProp(Optimizer):
         """
         super().__init__(learning_rate)
         self.beta = beta
+        
+        
+    def get_config(self) -> dict:
+        """
+        Returns a dictionary containing the configuration of the optimizer.
+
+        Returns
+        -------
+        dict
+            Configuration of the optimizer.
+        """
+        return {'learning_rate': self.learning_rate, 'beta': self.beta}
     
     
     def update(self, layer: Layer) -> None:
         """
-        Updates the weights and biases of the provided layer using the RMSProp algorithm.
+        Updates the weights and bias of the provided layer using the RMSProp algorithm.
 
         For each parameter, this method computes the moving average of squared gradients and 
         adjusts the learning rate for that particular parameter based on this average. 
@@ -50,7 +64,7 @@ class RMSProp(Optimizer):
         Parameters
         ----------
         layer : Layer
-            The layer whose weights and biases need to be updated.
+            The layer whose weights and bias need to be updated.
 
         Returns
         -------
@@ -59,14 +73,14 @@ class RMSProp(Optimizer):
         epsilon = 1e-15
         self._update_v(layer)
         
-        gradient_normalization_weights = np.sqrt(layer.vweights) + epsilon # normalizing the gradient for weights
+        gradient_normalization_weights = np.sqrt(layer.v_weights) + epsilon # normalizing the gradient for weights
         normalized_learning_rate = self.learning_rate / gradient_normalization_weights # normalizing the learning rate
-        layer.weights -= normalized_learning_rate * layer.dweights # updating the weights
+        layer.weights -= normalized_learning_rate * layer.d_weights # updating the weights
         
         if layer.has_bias:
-            gradient_normalization_biases = np.sqrt(layer.vbiases) + epsilon # normalizing the gradient for biases
-            normalized_learning_rate = self.learning_rate / gradient_normalization_biases # normalizing the learning rate
-            layer.biases -= normalized_learning_rate * layer.dbiases # updating the biases
+            gradient_normalization_bias = np.sqrt(layer.v_bias) + epsilon # normalizing the gradient for bias
+            normalized_learning_rate = self.learning_rate / gradient_normalization_bias # normalizing the learning rate
+            layer.bias -= normalized_learning_rate * layer.d_bias # updating the bias
     
     
     def _update_v(self, layer: Layer) -> None:
@@ -85,10 +99,10 @@ class RMSProp(Optimizer):
         -------
         None
         """
-        if not hasattr(layer, 'vweights'):
-            layer.initialize_v() # initializing the vweights and vbiases attributes if they don't exist
+        if not hasattr(layer, 'v_weights'):
+            layer.initialize_velocity() # initializing the v_weights and v_bias attributes if they don't exist
             
-        layer.vweights = self.beta * layer.vweights + (1 - self.beta) * layer.dweights ** 2 # updating the moving average of squared gradients for weights
+        layer.v_weights = self.beta * layer.v_weights + (1 - self.beta) * layer.d_weights ** 2 # updating the moving average of squared gradients for weights
         
         if layer.has_bias:
-            layer.vbiases = self.beta * layer.vbiases + (1 - self.beta) * layer.dbiases ** 2 # updating the moving average of squared gradients for biases
+            layer.v_bias = self.beta * layer.v_bias + (1 - self.beta) * layer.d_bias ** 2 # updating the moving average of squared gradients for bias

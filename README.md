@@ -49,9 +49,11 @@ cd skynet
 import numpy as np
 from keras.datasets import mnist
 from keras.utils import to_categorical
-from skynet_ml.nn.models.sequential import Sequential
+from skynet_ml.nn.models import Sequential
 from skynet_ml.nn.layers import Dense
-from skynet_ml.utils import save_model, plot_training_history
+from skynet_ml.nn.optimizers import Adam
+from skynet_ml.metrics import ConfusionMatrix
+from skynet_ml.utils.nn.early_stopping import EarlyStopping
 
 # read the mnist dataset
 (x_train, y_train),(x_test, y_test) = mnist.load_data()
@@ -71,24 +73,38 @@ x_test = x_test.astype('float32') / 255
 model = Sequential()
 
 # add layers to the mdoel
-model.add(Dense(n_units=16, activation="relu", input_dim=input_size))
-model.add(Dense(n_units=16, activation="relu"))
+model.add(Dense(n_units=150, activation="leaky_relu", input_dim=input_size))
+model.add(Dense(n_units=150, activation="leaky_relu"))
 model.add(Dense(n_units=num_labels, activation="softmax"))
 
 # compile the model
-model.compile(loss="categorical_crossentropy", optimizer="sgd", learning_rate=0.0001)
+opt = Adam(learning_rate=0.001, beta1=0.9, beta2=0.999)
+model.compile(loss="categorical_crossentropy", optimizer=opt, regularizer="l2")
 
 # fit your model
-model.fit(xtrain=x_train, ytrain=y_train, xval=x_test, yval=y_test, metrics=["accuracy", "precision", "recall", "f1"], epochs=20, batch_size=32, save_training_history_in="mnist_model_history.csv")
-
-# save the model 
-save_model(model, "mnist_model.pkl")
-
-# plot the training history
-plot_training_history("mnist_model_history.csv", save_in="mnist_model_history.png")
+model.fit(x_train=x_train, 
+          y_train=y_train, 
+          x_val=x_test, 
+          y_val=y_test, 
+          metrics=["accuracy", "precision", "recall", "fscore"], 
+          early_stopping=EarlyStopping(patience=10, min_delta=0.0001),
+          epochs=5, 
+          batch_size=32,
+          save_training_history_in="testing/logs/mnist_sequential.csv")
 
 # predict with the model
-yhat = model.predict(x_test)
+y_pred = model.predict(x_test)
+
+# compute the confusion matrix
+cf = ConfusionMatrix(task_type="multiclass").compute(y_test, y_pred)
+ConfusionMatrix(task_type="multiclass").plot(cf, save_in="testing/logs/confusion_matrix.png")
+
+# save the model 
+save_model(model, "testing/logs/mnist_sequential.pkl")
+plot_model(model, save_in="testing/logs/mnist_sequential_model.txt")
+
+# plot the training history
+plot_training_history("testing/logs/mnist_sequential.csv", save_in="testing/logs/mnist_sequential.png")
 ```
 
 ## Acknowledgements

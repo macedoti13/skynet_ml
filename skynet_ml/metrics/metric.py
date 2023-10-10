@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
+
 class Metric(ABC):
     """
     Base abstract class for metrics in machine learning tasks.
@@ -8,21 +9,18 @@ class Metric(ABC):
     This class provides a blueprint for all the metric subclasses and ensures they implement the `compute` method.
     It also provides a helper method to check the shape consistency between predicted and true labels.
 
-    Attributes
-    ----------
-    None
-
     Methods
     -------
     compute(yhat: np.array, ytrue: np.array) -> float:
         Abstract method. Subclasses should provide their implementation to compute the metric value.
 
-    _check_shape(yhat: np.array, ytrue: np.array) -> None:
+    check_shape(yhat: np.array, ytrue: np.array) -> None:
         Helper method to validate the shapes of predicted and true labels.
     """
-
+    
+    
     @abstractmethod
-    def compute(self, yhat: np.array, ytrue: np.array) -> float:
+    def compute(self, y_true: np.array, y_hat: np.array) -> float:
         """
         Abstract method to compute the metric value for given predictions and true labels.
 
@@ -36,16 +34,25 @@ class Metric(ABC):
         ytrue : np.array
             True labels.
 
-        Returns
+        Returns`
         -------
         float
             The computed metric value.
         """
+        
         pass
     
     
     @classmethod
-    def _check_shape(cls, yhat: np.array, ytrue: np.array) -> None:
+    def get_config(self):
+        """
+        Get the configuration of the metric.
+        """
+        return {}
+    
+    
+    @classmethod
+    def check_shape(cls, y_true: np.array, y_hat: np.array) -> None:
         """
         Validate the shapes of predicted and true labels.
 
@@ -65,5 +72,6 @@ class Metric(ABC):
         ValueError:
             If the shapes of yhat and ytrue don't match or aren't 2D arrays.
         """
-        if (yhat.shape != ytrue.shape) or (yhat.ndim != 2):
-            raise ValueError(f"yhat and ytrue must be 2D arrays of the same size, got {yhat.shape} and {ytrue.shape}")
+        
+        if (y_hat.shape != y_true.shape) or (y_hat.ndim != 2):
+            raise ValueError(f"y_true and y_hat must have the same shape and be 2D arrays. y_true shape: {y_true.shape}, y_hat shape: {y_hat.shape}")
