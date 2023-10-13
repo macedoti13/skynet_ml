@@ -598,6 +598,7 @@ class Sequential:
         if not metrics:
             return []  # Return an empty list if no metrics are provided
             
+            
         def determine_task_type(metric: str) -> str:
             """
             This function determines the task type based on the metric name and the configurations
