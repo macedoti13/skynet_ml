@@ -1,83 +1,53 @@
-from skynet_ml.nn.activations.activation import Activation
+from skynet_ml.nn.activations.base import BaseActivation
 import numpy as np
 
 
-class Sigmoid(Activation):
+class Sigmoid(BaseActivation):
     """
-    The Sigmoid Activation function.
+    Sigmoid activation function.
+    Computes the function f(x) = 1 / (1 + exp(-x)).
     
-    The Sigmoid function is a type of activation function that is traditionally
-    used in binary classification problems. It squashes its input to be between
-    0 and 1, which is also the reason why it’s used in the output layer of a binary 
-    classification neural network.
-    
-    Attributes
-    ----------
-    name : str
-        Name of the activation function.
-    
-    Methods
-    -------
-    get_config() -> dict
-        Retrieve the configuration of the activation function.
-    compute(z: np.array) -> np.array
-        Compute the forward pass of the Sigmoid activation function.
-    gradient(z: np.array) -> np.array
-        Compute the gradient of the Sigmoid activation with respect to its input.
+    Notes:
+        - It squashes the input to the range [0, 1]. Larger values are closer to 1 and smaller values are closer to 0.
+        - The output can be interpreted as a probability.
+        - Suffers from the vanishing gradient problem when the input is large or small.
+        - Useful for binary or multi-label classification problems.
+        - The gradient varies with the input value but is always between 0 and 0.25.
+        - Its output is not zero-centered, which can be problematic for gradient-based optimization methods.
+    """    
 
-    Example
-    -------
-    >>> sigmoid = Sigmoid()
-    >>> input_array = np.array([[2, -1], [-3, 4]])
-    >>> output_array = sigmoid.compute(input_array)
-    >>> gradient_array = sigmoid.gradient(input_array)
-    """
-    
     
     def __init__(self) -> None:
         """
-        Initialize the Sigmoid object with the name attribute set to 'Sigmoid'.
-        """
-        self.name = "Sigmoid"
+        Initializes the activation function.
+        """        
+        self.name = "sigmoid"
     
 
     def compute(self, z: np.array) -> np.array:
         """
-        Compute the forward pass of the Sigmoid activation function.
-        
-        The Sigmoid function squashes the input `z` to be between 0 and 1.
+        Computes the sigmoid activation for the given input array.
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
+        Args:
+            z (np.array): The input array to the activation function. Expected to have a shape (batch_size, n_units).
 
-        Returns
-        -------
-        np.array
-            The output of the Sigmoid activation function.
-        """
+        Returns:
+            np.array: The activated output, with values squashed to the range [0, 1].
+        """        
         self._check_shape(z)
         return 1 / (1 + np.exp(-z))
     
     
     def gradient(self, z: np.array) -> np.array:
         """
-        Compute the gradient of the Sigmoid activation with respect to its input.
-        
-        This method computes the derivative of the Sigmoid function, which is used 
-        during the backpropagation step in training of neural networks.
+        Computes the gradient of the sigmoid activation for the given input array.
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
+        Args:
+            z (np.array): The input array to the activation function. Expected to have a shape (batch_size, n_units).
 
-        Returns
-        -------
-        np.array
-            The gradient of the Sigmoid activation with respect to its input `z`.
-        """
+        Returns:
+            np.array: The gradient, which is sigmoid(z) * (1 - sigmoid(z)).
+        """        
         self._check_shape(z)
         sigmoid = self.compute(z)
         return sigmoid * (1 - sigmoid)

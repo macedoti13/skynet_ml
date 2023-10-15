@@ -1,82 +1,51 @@
-from skynet_ml.nn.activations.activation import Activation
+from skynet_ml.nn.activations.base import BaseActivation
 import numpy as np
 
 
-class ReLU(Activation):
+class ReLU(BaseActivation):
     """
-    The Rectified Linear Unit (ReLU) Activation function.
-
-    The ReLU function is a type of activation function that is widely used in
-    convolutional neural networks and deep learning models. The function returns 0 
-    if it receives any negative input, but for any positive value `x` it returns that 
-    value back.
-
-    Attributes
-    ----------
-    name : str
-        Name of the activation function.
-
-    Methods
-    -------
-    get_config() -> dict
-        Retrieve the configuration of the activation function.
-    compute(z: np.array) -> np.array
-        Compute the forward pass of the ReLU activation function.
-    gradient(z: np.array) -> np.array
-        Compute the gradient of the ReLU activation with respect to its input.
-
-    Example
-    -------
-    >>> relu = ReLU()
-    >>> input_array = np.array([[2, -1], [-3, 4]])
-    >>> output_array = relu.compute(input_array)
-    >>> gradient_array = relu.gradient(input_array)
-    """
+    Rectified Linear Unit (ReLU) activation function. 
+    Computes the function f(x) = max(0, x).
+    
+    Notes:
+        - It acts as a pass-through for positive values and returns 0 for negative values.
+        - Outperforms sigmoid and tanh activations in deep neural networks due to reduced impact from the vanishing gradient problem.
+        - The gradient is 1 for x > 0, 0 for x < 0, and undefined for x = 0.
+    """    
     
     
     def __init__(self) -> None:
         """
-        Initialize the ReLU object with the name attribute set to 'ReLU'.
-        """
-        self.name = "ReLU"
+        Initializes the activation function.
+        """        
+        self.name = "relu"
         
         
     def compute(self, z: np.array) -> np.array:
         """
-        Compute the forward pass of the ReLU activation function.
+        Computes the ReLU activation for the given input array.
 
-        This function will return an array with the same shape as the input, where each
-        element is the input if it's positive, otherwise zero.
+        Args:
+            z (np.array): Input array to the activation function. 
+                          Expected to have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
-
-        Returns
-        -------
-        np.array
-            The output of the ReLU activation function.
-        """
+        Returns:
+            np.array: The activated output, with negative values clipped to 0 and positive values unchanged.
+        """        
         self._check_shape(z)
         return np.maximum(z, 0)
     
     
     def gradient(self, z: np.array) -> np.array:
         """
-        Compute the gradient of the ReLU activation with respect to its input.
+        Computes the gradient of the ReLU activation for the given input array.
 
-        The gradient is one for positive inputs and zero for non-positive inputs.
+        Args:
+            z (np.array): Input array to the activation function. 
+                          Expected to have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
-
-        Returns
-        -------
-        np.array
-            The gradient of the ReLU activation with respect to its input `z`.
-        """
+        Returns:
+            np.array: The gradient, which is 1 for x > 0 and 0 for x < 0. Undefined for x = 0.
+        """        
         self._check_shape(z)
         return np.where(z > 0, 1, 0)

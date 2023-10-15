@@ -1,100 +1,82 @@
-from skynet_ml.nn.optimizers.optimizer import Optimizer
-from skynet_ml.nn.layers.layer import Layer
+from skynet_ml.nn.optimizers.base import BaseOptimizer
+from skynet_ml.nn.layers.base import BaseLayer
 import numpy as np
 
-class AdaGrad(Optimizer):
-    """
-    AdaGrad (Adaptive Gradient Algorithm) optimization algorithm.
 
+class AdaGrad(BaseOptimizer):
+    """
+    Adaptive Gradient Algorithm (AdaGrad) optimizer.
+    
     AdaGrad is an adaptive learning rate optimization algorithm designed to improve 
-    the performance and training speed of machine learning algorithms. It adapts 
-    the learning rates of all model parameters by scaling them inversely proportional 
-    to the square root of the sum of all their historical squared values.
+    convergence and training stability by scaling learning rates with respect to 
+    the historical gradient at each parameter.
 
-    The primary idea behind AdaGrad is that frequently occurring features should 
-    have their learning rates decreased, while infrequent features should have their 
-    learning rates increased. This can be especially useful for sparse data.
-
-    Inherits from:
-    - Optimizer: Base class for optimization algorithms.
-
-    Attributes
-    ----------
-    learning_rate : float
-        The initial learning rate for the optimizer.
-
-    Methods
-    -------
-    update(layer: Layer) -> None:
-        Updates the weights and bias of the provided layer using AdaGrad.
-
-    _update_v(layer: Layer) -> None:
-        Internal helper method to update the accumulated squared gradients.
-    """
+    Args:
+        BaseOptimizer (BaseOptimizer): Inherits basic optimizer properties and methods.
+    """    
     
-    def get_config(self) -> dict:
+    def __init__(self, learning_rate: float = 0.01) -> None:
         """
-        Returns a dictionary containing the configuration of the optimizer.
+        Initializes the RMSProp optimizer with the given learning rate and decay factor.
 
-        Returns
-        -------
-        dict
-            Configuration of the optimizer.
-        """
-        return {'learning_rate': self.learning_rate}
+        Args:
+            learning_rate (float, optional): Learning rate used in the parameter updates. Defaults to 0.01.
+        """        
+        super().__init__(learning_rate)
+        self.name = f"adagrad_{str(self.learning_rate)}"
     
     
-    def update(self, layer: Layer) -> None:
+    def update(self, layer: BaseLayer) -> None:
         """
-        Updates the weights and bias of the provided layer using the AdaGrad algorithm.
+        Performs a parameter update using the AdaGrad algorithm.
+
+        Adjusts the weights and biases (if present) of the given layer based on the 
+        historical gradient to ensure more robust convergence.
+
+        Args:
+            layer (BaseLayer): The neural network layer whose parameters (weights and biases) 
+            need to be updated based on the accumulated squared gradients.
+        """
         
-        The learning rate is adapted based on the accumulation of squared gradients up to the current step.
-        This helps in adjusting the learning rates of the weights during the optimization process.
-        Frequently occurring features should have their learning rates decreased and infrequent ones should 
-        have them increased.
-
-        Parameters
-        ----------
-        layer : Layer
-            The layer whose weights and bias need to be updated.
-
-        Returns
-        -------
-        None
-        """
         epsilon = 1e-15
         self._update_v(layer)
         
-        gradient_normalization_weights = np.sqrt(layer.v_weights) + epsilon # normalizing the gradient for weights
-        normalized_learning_rate = self.learning_rate / gradient_normalization_weights # normalizing the learning rate
-        layer.weights -= normalized_learning_rate * layer.d_weights # updating the weights
+        # normalizing the gradient for weights
+        gradient_normalization_weights = np.sqrt(layer.v_weights) + epsilon 
+        # normalizing the learning rate
+        normalized_learning_rate = self.learning_rate / gradient_normalization_weights 
+        # updating the weights
+        layer.weights -= normalized_learning_rate * layer.d_weights 
         
-        if layer.has_bias:
-            gradient_normalization_bias = np.sqrt(layer.v_bias) + epsilon # normalizing the gradient for bias
-            normalized_learning_rate = self.learning_rate / gradient_normalization_bias # normalizing the learning rate
-            layer.bias -= normalized_learning_rate * layer.d_bias # updating the bias
+        
+        if layer.has_bias:    
+            # normalizing the gradient for bias
+            gradient_normalization_bias = np.sqrt(layer.v_bias) + epsilon 
+            # normalizing the learning rate
+            normalized_learning_rate = self.learning_rate / gradient_normalization_bias 
+            # updating the bias
+            layer.bias -= normalized_learning_rate * layer.d_bias 
             
             
-    def _update_v(self, layer: Layer) -> None:
+    def _update_v(self, layer: BaseLayer) -> None:
         """
-        Internal helper method to update the accumulated squared gradients (v_weights and v_bias) for a layer.
+        Updates the accumulated squared gradients for the given layer.
 
-        For each parameter, this method accumulates the squared gradients, which are used in the update step
-        to adjust the learning rate for that particular parameter.
+        Accumulates the squared gradients of the weights and biases (if present) of the 
+        layer to be used in the subsequent update steps.
 
-        Parameters
-        ----------
-        layer : Layer
-            The layer whose accumulated squared gradients need to be updated.
-
-        Returns
-        -------
-        None
+        Args:
+            layer (BaseLayer): The neural network layer for which the accumulated squared 
+            gradients are being updated.
         """
+        
+        # initializing the v_weights and v_bias attributes if they don't exist
         if not hasattr(layer, 'v_weights'):
-            layer.initialize_velocity() # initializing the v_weights and v_bias attributes if they don't exist
+            layer.initialize_velocity()
             
-        layer.v_weights += layer.d_weights ** 2 # updating the v_weights
+        # updating the v_weights
+        layer.v_weights += layer.d_weights ** 2 
         
+        # updating the v_bias
         if layer.has_bias:
-            layer.v_bias += layer.d_bias ** 2 # updating the v_bias
+            layer.v_bias += layer.d_bias ** 2

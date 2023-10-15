@@ -1,80 +1,50 @@
-from skynet_ml.nn.activations.activation import Activation
+from skynet_ml.nn.activations.base import BaseActivation
 import numpy as np
 
 
-class Tanh(Activation):
+class Tanh(BaseActivation):
     """
-    The Hyperbolic Tangent (Tanh) Activation Function.
-
-    The Tanh function is used as an activation function in neural networks 
-    due to its properties of outputting values between -1 and 1, which can be 
-    useful in various scenarios, such as when the model needs to predict values 
-    that are ordered (rankings), centered around 0.
-
-    Attributes
-    ----------
-    name : str
-        Name of the activation function.
-
-    Methods
-    -------
-    get_config() -> dict
-        Retrieve the configuration of the activation function.
-    compute(z: np.array) -> np.array
-        Compute the forward pass of the Tanh activation function.
-    gradient(z: np.array) -> np.array
-        Compute the gradient of the Tanh activation with respect to its input.
-
-    Example
-    -------
-    >>> tanh_activation = Tanh()
-    >>> input_array = np.array([[2, -1], [-3, 4]])
-    >>> output_array = tanh_activation.compute(input_array)
-    >>> gradient_array = tanh_activation.gradient(input_array)
-    """
+    Computes the hyperbolic tangent function, f(x) = tanh(x).
     
+    Notes:
+        - It squashes the input to the range [-1, 1]. Larger values are closer to 1 and smaller values are closer to -1.
+        - Useful in hidden layers of neural networks.
+        - Can suffer from the vanishing gradient problem, especially when inputs are far from the origin along the x-axis.
+        - The gradient varies with the input but is always between 0 and 1, becoming very small for large absolute values of the input.
+    """    
+
     
     def __init__(self) -> None:
         """
-        Initialize the Tanh object with the name attribute set to 'Tanh'.
-        """
-        self.name = "Tanh"
+        Initializes the activation function.
+        """        
+        self.name = "tanh"
 
 
     def compute(self, z: np.array) -> np.array:
         """
-        Compute the forward pass of the Tanh activation function.
+        Computes the tanh activation for the given input array.
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
+        Args:
+            z (np.array): The input array to the activation function. Expected to have a shape (batch_size, n_units).
 
-        Returns
-        -------
-        np.array
-            The output of the Tanh activation function.
-        """
+        Returns:
+            np.array: The activated output, with values in the range [-1, 1].
+        """        
         self._check_shape(z)
         return np.tanh(z)
 
 
     def gradient(self, z: np.array) -> np.array:
         """
-        Compute the gradient of the Tanh activation with respect to its input.
+        Computes the gradient of the tanh activation for the given input array.
 
-        The gradient is calculated as 1 - tanh^2(z).
+        Args:
+            z (np.array): The input array to the activation function. Expected to have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
-
-        Returns
-        -------
-        np.array
-            The gradient of the Tanh activation with respect to its input `z`.
-        """
+        Returns:
+            np.array: The gradient, diminishing as the absolute value of the input grows, calculated as 1 - tanh(z) ** 2.
+        """        
         self._check_shape(z)
         tanh = self.compute(z)
         return 1 - tanh ** 2

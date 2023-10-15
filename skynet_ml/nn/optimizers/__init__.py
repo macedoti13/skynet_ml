@@ -1,10 +1,10 @@
-from skynet_ml.nn.optimizers.sgd import SGD
-from skynet_ml.nn.optimizers.adam import Adam
 from skynet_ml.nn.optimizers.rmsprop import RMSProp
 from skynet_ml.nn.optimizers.adagrad import AdaGrad
+from skynet_ml.nn.optimizers.adam import Adam
+from skynet_ml.nn.optimizers.sgd import SGD
 
 
-OPTIMIZERS_MAP = {
+optimizers_map = {
     "sgd": SGD,
     "adam": Adam,
     "rmsprop": RMSProp,

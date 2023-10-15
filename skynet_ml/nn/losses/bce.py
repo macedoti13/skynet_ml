@@ -1,107 +1,79 @@
-from skynet_ml.nn.losses.loss import Loss
 from skynet_ml.utils.factories import ActivationsFactory
+from skynet_ml.nn.losses.base import BaseLoss
 import numpy as np
 
 
-class BinaryCrossEntropy(Loss):
+class BinaryCrossEntropy(BaseLoss):
     """
-    Binary Cross Entropy (BCE) Loss Class
+    Implements the Binary Cross-Entropy (BCE) loss function.
+    
+    BCE is used for binary classification tasks. It quantifies the difference between two probability distributions:
+    the true label distribution and the predicted label distribution.
+    
+    Mathematically, for true labels y_true and predicted probabilities y_pred, it is defined as:
 
-    This class represents the BCE loss, used in binary classification tasks. It computes the average negative log 
-    likelihood between true class labels and predicted probabilities. The `compute` method calculates the loss, while 
-    the `gradient` method computes the gradient of the loss with respect to the predictions.
+        BCE = -Σ [y_true * log(y_pred) + (1 - y_true) * log(1 - y_pred)]
 
-    When from_logits=True, it assumes that the predicted values (y_hat) are logits (i.e., the output of a linear layer),
-    and hence it would apply a sigmoid function to convert them into probabilities. This means that when from_logits=True,
-    the output layer of the network MUST be a linear layer. If from_logits is set to True and the network's output layer 
-    is a sigmoid, the sigmoid function would be applied twice, resulting in incorrect results.
+    Notes:
+        - The output values of y_pred should lie between [0, 1].
+        - BCE will be high if the predicted probabilities diverge from the true labels and low if they are close.
+        - It is sensitive to the confidence of the predictions, i.e., predictions that are far off from the true label 
+          have a larger impact than those that are close.
 
-    When from_logits=False, it assumes y_hat to be probabilities and uses them directly to compute the loss. In this case,
-    the output layer of the network should be a sigmoid layer to ensure that the predictions are probabilities.
-
-    Methods
-    -------
-    compute(y_true: np.array, y_hat: np.array) -> float:
-        Computes the binary cross entropy loss.
-
-    gradient(y_true: np.array, y_hat: np.array) -> np.array:
-        Computes the gradient of the binary cross entropy loss with respect to the predictions.
+    Args:
+        from_logits (bool): If True, the predicted values are expected to be logits and will be passed through the sigmoid activation.
+                            If False, they are expected to already be in the range [0, 1]. Default is True.
     """
-
-
+    
+    
     def __init__(self, from_logits: bool = True) -> None:
         """
-        Parameters
-        ----------
-        from_logits : bool, optional
-            Whether the predicted values are probabilities or logits.
-            If True, it applies sigmoid on predicted values to get probabilities.
-            If False, it uses predicted values as probabilities.
+        Initializes the loss function with its name and the `from_logits` parameter.
         """
         self.from_logits = from_logits
-        self.name = "binary_crossentropy"
+        self.name = f"binary_crossentropy_{str(from_logits)}"
+    
         
-        
-    def compute(self, y_true: np.array, y_hat: np.array) -> float:
+    def compute(self, y_true: np.array, y_pred: np.array) -> float:
         """
-        Compute the binary cross entropy loss.
+        Computes the Binary Cross-Entropy loss for the given true labels and predicted probabilities.
 
-        Parameters
-        ----------
-        y_true : np.array
-            Ground truth (correct) target values.
-        y_hat : np.array
-            Estimated targets as returned by a model.
-            
-        Returns
-        -------
-        float
-            The computed binary cross entropy loss value.
+        Args:
+            y_true (np.array): Ground truth labels. Expected to be a 2D array with shape (batch_size, 1).
+            y_pred (np.array): Predicted probabilities from the model. Expected to have the same shape as y_true.
+
+        Returns:
+            float: The computed Binary Cross-Entropy loss.
         """
-        self._check_shape(y_true, y_hat)
+        self._check_shape(y_true, y_pred)
         
         if self.from_logits:
-            y_hat = ActivationsFactory.get_object("sigmoid").compute(y_hat)
+            sigmoid = ActivationsFactory().get_object("sigmoid")
+            y_pred = sigmoid.compute(y_pred)
             
         epsilon = 1e-7
-        y_hat = np.clip(y_hat, epsilon, 1 - epsilon) # Avoid log(0)
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon) 
 
-        return -np.mean(y_true * np.log(y_hat) + (1 - y_true) * np.log(1 - y_hat))
+        return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
     
     
-    def gradient(self, y_true: np.array, y_hat: np.array) -> np.array:
+    def gradient(self, y_true: np.array, y_pred: np.array) -> np.array:
         """
-        Compute the gradient of the binary cross entropy loss.
+        Computes the gradient of the Binary Cross-Entropy loss with respect to the predicted probabilities.
 
-        Parameters
-        ----------
-        y_true : np.array
-            Ground truth (correct) target values.
-        y_hat : np.array
-            Estimated targets as returned by a model.
-            
-        Returns
-        -------
-        np.array
-            The gradient of the binary cross entropy loss with respect to predictions.
+        Args:
+            y_true (np.array): Ground truth labels. Expected to be a 2D array with shape (batch_size, 1).
+            y_pred (np.array): Predicted probabilities from the model. Expected to have the same shape as y_true.
+
+        Returns:
+            np.array: Gradient of the loss with respect to the predicted probabilities. Expected to have the same shape as y_pred.
         """
-        self._check_shape(y_true, y_hat)
+        self._check_shape(y_true, y_pred)
         
         if self.from_logits:
-            y_hat = ActivationsFactory.get_object("sigmoid").compute(y_hat)
+            sigmoid = ActivationsFactory().get_object("sigmoid")
+            y_pred = sigmoid.compute(y_pred)
             
         epsilon = 1e-7
-        y_hat = np.clip(y_hat, epsilon, 1 - epsilon)
-        return (y_hat - y_true) / (y_hat * (1 - y_hat))
-        
-    
-    def get_config(self) -> dict:
-        """
-        Get the configuration of the binary cross entropy loss.
-
-        Returns
-        -------
-        dict
-            The configuration of the binary cross entropy loss.
-        """
-        return {"from_logits": self.from_logits}
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon) # Avoid log(0)
+        return (y_pred - y_true) / (y_pred * (1 - y_pred))

@@ -1,60 +1,58 @@
-from skynet_ml.nn.losses.loss import Loss
+from skynet_ml.nn.losses.base import BaseLoss
 import numpy as np
 
 
-class MeanSquaredError(Loss):
+class MeanSquaredError(BaseLoss):
     """
-    Mean Squared Error (MSE) Loss Class
+    Implements the Mean Squared Error (MSE) loss function.
 
-    This class represents the MSE loss, often used in regression tasks. It computes the mean of the squared differences 
-    between the true and predicted values. The `compute` method calculates the loss, while the `gradient` method computes 
-    the gradient of the loss with respect to the predictions.
+    MSE is commonly used for regression tasks. It calculates the average of the squared differences 
+    between the predicted and actual values.
 
-    Methods
-    -------
-    compute(y_true: np.array, y_hat: np.array) -> float:
-        Computes the mean squared error loss.
+    Mathematically, for true values y_true and predicted values y_pred, it is defined as:
 
-    gradient(y_true: np.array, y_hat: np.array) -> np.array:
-        Computes the gradient of the mean squared error loss with respect to the predictions.
+        MSE = (1/n) * Σ (y_true - y_pred)^2
+
+    where 'n' is the number of samples.
+
+    Notes:
+        - MSE will be high if the predicted values are far from the true values and low if they are close.
+        - Its minimum value is 0, which indicates perfect predictions.
     """
-
-
-    def compute(self, y_true: np.array, y_hat: np.array) -> float:
+    
+    
+    def __init__(self) -> None:
         """
-        Compute the mean squared error loss.
-
-        Parameters
-        ----------
-        y_true : np.array
-            Ground truth (correct) target values.
-        y_hat : np.array
-            Estimated targets as returned by a model.
-            
-        Returns
-        -------
-        float
-            The computed mean squared error loss value.
+        Initializes the loss function with its name.
         """
-        self._check_shape(y_true, y_hat)
-        return np.mean((y_true - y_hat)**2)
+        self.name = "mean_squared_error"
 
 
-    def gradient(self, y_true: np.array, y_hat: np.array) -> np.array:
+    def compute(self, y_true: np.array, y_pred: np.array) -> float:
         """
-        Compute the gradient of the mean squared error loss.
+        Computes the Mean Squared Error for the given true and predicted values.
 
-        Parameters
-        ----------
-        y_true : np.array
-            Ground truth (correct) target values.
-        y_hat : np.array
-            Estimated targets as returned by a model.
-            
-        Returns
-        -------
-        np.array
-            The gradient of the mean squared error loss with respect to predictions.
+        Args:
+            y_true (np.array): Ground truth labels. Expected to be a 2D array with shape (batch_size, n_classes).
+            y_pred (np.array): Predicted labels from the model. Expected to have the same shape as y_true.
+
+        Returns:
+            float: The computed Mean Squared Error.
         """
-        self._check_shape(y_true, y_hat)
-        return -2 * (y_true - y_hat)
+        self._check_shape(y_true, y_pred)
+        return np.mean((y_true - y_pred)**2)
+
+
+    def gradient(self, y_true: np.array, y_pred: np.array) -> np.array:
+        """
+        Computes the gradient of the Mean Squared Error with respect to the predicted values.
+
+        Args:
+            y_true (np.array): Ground truth labels. Expected to be a 2D array with shape (batch_size, n_classes).
+            y_pred (np.array): Predicted labels from the model. Expected to have the same shape as y_true.
+
+        Returns:
+            np.array: Gradient of the loss with respect to the predicted values. Expected to have the same shape as y_pred.
+        """
+        self._check_shape(y_true, y_pred)
+        return -2 * (y_true - y_pred)

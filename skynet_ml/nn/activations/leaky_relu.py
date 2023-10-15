@@ -1,110 +1,54 @@
-from skynet_ml.nn.activations.activation import Activation
+from skynet_ml.nn.activations.base import BaseActivation
 import numpy as np
 
 
-class LeakyReLU(Activation):
+class LeakyReLU(BaseActivation):
     """
-    The Leaky Rectified Linear Unit (ReLU) Activation function.
-
-    The LeakyReLU is a variant of the ReLU function that allows small, 
-    non-zero gradients when the unit is not active, which can help 
-    mitigate the vanishing gradient problem in deep networks. The 
-    'leakiness' of the activation function is controlled by the alpha 
-    parameter, a small positive value.
-
-    Attributes
-    ----------
-    alpha : float
-        The slope coefficient for the negative part of the function. 
-        Default is 0.01.
-    name : str
-        Name of the activation function.
-
-    Methods
-    -------
-    get_config() -> dict
-        Retrieve the configuration of the activation function.
-    compute(z: np.array) -> np.array
-        Compute the forward pass of the LeakyReLU activation function.
-    gradient(z: np.array) -> np.array
-        Compute the gradient of the LeakyReLU activation with respect to its input.
-
-    Example
-    -------
-    >>> leaky_relu = LeakyReLu(alpha=0.01)
-    >>> input_array = np.array([[2, -1], [-3, 4]])
-    >>> output_array = leaky_relu.compute(input_array)
-    >>> gradient_array = leaky_relu.gradient(input_array)
-    """
+    Leaky Rectified Linear Unit (LeakyReLU) activation function.
+    Computes the function f(x) = max(alpha * x, x) where alpha is a small constant, typically close to 0.
+    
+    Notes:
+        - It acts as a pass-through for positive values and multiplies negative values by the constant alpha.
+        - Outperforms sigmoid and tanh activations in deep neural networks due to reduced impact from the vanishing gradient problem.
+        - Provides an advantage over ReLU by preventing dead neurons (neurons that never activate due to a negative gradient).
+        - The gradient is 1 for x > 0, alpha for x < 0. While theoretically undefined for x = 0, in practice, it is treated as 1.
+    """    
     
     
     def __init__(self, alpha: float = 0.01) -> None:
         """
-        Initialize the LeakyReLU object with the slope coefficient alpha 
-        and the name attribute set to 'LeakyReLU'.
+        Initializes the activation function.
 
-        Parameters
-        ----------
-        alpha : float, optional
-            The slope coefficient for the negative part of the function. 
-            Default is 0.01.
-        """
+        Args:
+            alpha (float, optional): Small constant for negative input values. Typically close to 0. Defaults to 0.01.
+        """        
         self.alpha = alpha
-        self.name = "LeakyReLU"
+        self.name = "leaky_relu"
+
         
-        
-    def get_config(self):
-        """
-        Get the configuration of the ReLU activation function.
-
-        Since ReLU activation function does not have hyperparameters, 
-        this method returns an empty dictionary.
-
-        Returns
-        -------
-        dict
-            An empty dictionary.
-        """
-        return {"alpha": self.alpha}
-
-
     def compute(self, z: np.array) -> np.array:
         """
-        Compute the forward pass of the LeakyReLU activation function.
+        Computes the LeakyReLU activation for the given input array.
 
-        For input values greater than zero, it returns the input value itself.
-        For input values less than or equal to zero, it returns alpha times 
-        the input value.
+        Args:
+            z (np.array): The input array to the activation function. Expected to have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
-
-        Returns
-        -------
-        np.array
-            The output of the LeakyReLU activation function.
-        """
+        Returns:
+            np.array: The activated output, with negative values multiplied by alpha and positive values unchanged.
+        """        
         self._check_shape(z)
         return np.where(z > 0, z, self.alpha * z)
 
-
+    
     def gradient(self, z: np.array) -> np.array:
         """
-        Compute the gradient of the LeakyReLU activation with respect to its input.
+        Computes the gradient of the LeakyReLU activation for the given input array.
 
-        The gradient is one for positive input values and alpha for negative input values.
+        Args:
+            z (np.array): The input array to the activation function. Expected to have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
-
-        Returns
-        -------
-        np.array
-            The gradient of the LeakyReLU activation with respect to its input `z`.
-        """
+        Returns:
+            np.array: The gradient, which is 1 for x > 0 and alpha for x < 0. Treated as 1 for x = 0 for computational purposes.
+        """        
         self._check_shape(z)
         return np.where(z > 0, 1, self.alpha)

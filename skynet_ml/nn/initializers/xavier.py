@@ -1,120 +1,72 @@
-from skynet_ml.nn.initializers.initializer import Initializer
+from skynet_ml.nn.initializers.base import BaseInitializer
 import numpy as np
 
 
-class XavierNormal(Initializer):
+class XavierNormal(BaseInitializer):
     """
-    Xavier Normal weight initializer (also known as Glorot Normal initializer).
+    Initializes weights using the Xavier (or Glorot) normal initialization method.
 
-    This class initializes weights with a zero mean and a variance of 1/n, where n is the number of input units.
-    It is effective for networks in which the activation function for hidden units is a sigmoid or hyperbolic tangent.
+    The Xavier normal initializer is designed for layers with the tanh activation function.
+    It initializes the weights from a normal distribution with mean 0 and standard deviation sqrt(1 / n), 
+    where n is the number of input units in the weight tensor.
 
-    Parameters
-    ----------
-    None
-
-    Attributes
-    ----------
-    name : str
-        The name identifier of the initializer, set to 'Xavier Normal'.
-
-    Methods
-    -------
-    get_config() -> dict
-        Returns an empty dictionary as there are no hyperparameters for this initializer.
-    initialize_weights(input_dim: int, n_units: int) -> np.array
-        Initializes and returns the weights with zero mean and a variance of 1/n.
-
-    Examples
-    --------
-    >>> initializer = XavierNormal()
-    >>> weights = initializer.initialize_weights(5, 10)
+    Attributes:
+        name (str): Name representation for the initializer, useful for debugging and logging.
     """
 
 
     def __init__(self) -> None:
         """
-        Initializes a `XavierNormal` instance.
+        Initializes the Xavier normal weight initializer.
         """
-        self.name = "Xavier Normal"
-        
-    
+        self.name = "xavier_normal"
+
+
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         """
-        Initializes weights using a normal distribution with zero mean and a variance of 1/n.
+        Initializes the weights matrix using the Xavier normal initialization method.
 
-        The size of the initialized weight matrix is determined by the `input_dim` and `n_units` parameters.
+        Args:
+            input_dim (int): Number of input features or units from the previous layer.
+            n_units (int): Number of units in the current layer for which weights need to be initialized.
 
-        Parameters
-        ----------
-        input_dim : int
-            The dimensionality of the input data.
-        n_units : int
-            The number of units in the layer for which the weights are initialized.
-
-        Returns
-        -------
-        np.array
-            A 2D numpy array containing the initialized weights with a shape of (input_dim, n_units).
+        Returns:
+            np.array: Weight matrix of shape (input_dim, n_units) initialized with values drawn from the specified normal distribution.
         """
         std = np.sqrt(1.0 / input_dim)
         return np.random.normal(0.0, std, (input_dim, n_units))
 
 
-class XavierUniform(Initializer):
+class XavierUniform(BaseInitializer):
     """
-    Xavier Uniform weight initializer (also known as Glorot Uniform initializer).
+    Initializes weights using the Xavier (or Glorot) uniform initialization method.
 
-    This class initializes weights with values drawn from a uniform distribution in the interval [-limit, limit],
-    where limit is sqrt(6 / (n_in + n_out)) and n_in is the number of input units.
+    The Xavier uniform initializer is designed for layers with the tanh activation function.
+    It initializes the weights from a uniform distribution within the range [-limit, limit], 
+    where limit is sqrt(6 / (n + m)) and n is the number of input units and m is the number of output units in the weight tensor.
 
-    Parameters
-    ----------
-    None
-
-    Attributes
-    ----------
-    name : str
-        The name identifier of the initializer, set to 'Xavier Uniform'.
-
-    Methods
-    -------
-    get_config() -> dict
-        Returns an empty dictionary as there are no hyperparameters for this initializer.
-    initialize_weights(input_dim: int, n_units: int) -> np.array
-        Initializes and returns the weights using Xavier Uniform initialization.
-
-    Examples
-    --------
-    >>> initializer = XavierUniform()
-    >>> weights = initializer.initialize_weights(5, 10)
+    Attributes:
+        name (str): Name representation for the initializer, useful for debugging and logging.
     """
 
 
     def __init__(self) -> None:
         """
-        Initializes a `XavierUniform` instance.
+        Initializes the Xavier uniform weight initializer.
         """
-        self.name = "Xavier Uniform"
-        
-        
+        self.name = "xavier_uniform"
+
+
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         """
-        Initializes weights using Xavier Uniform initialization.
+        Initializes the weights matrix using the Xavier uniform initialization method.
 
-        The size of the initialized weight matrix is determined by the `input_dim` and `n_units` parameters.
+        Args:
+            input_dim (int): Number of input features or units from the previous layer.
+            n_units (int): Number of units in the current layer for which weights need to be initialized.
 
-        Parameters
-        ----------
-        input_dim : int
-            The dimensionality of the input data.
-        n_units : int
-            The number of units in the layer for which the weights are initialized.
-
-        Returns
-        -------
-        np.array
-            A 2D numpy array containing the initialized weights with a shape of (input_dim, n_units).
+        Returns:
+            np.array: Weight matrix of shape (input_dim, n_units) initialized with values drawn from the specified uniform distribution.
         """
         limit = np.sqrt(6.0 / (input_dim + n_units))
         return np.random.uniform(-limit, limit, (input_dim, n_units))

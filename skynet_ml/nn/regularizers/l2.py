@@ -1,91 +1,64 @@
-from skynet_ml.nn.regularizers.regularizer import Regularizer
+from skynet_ml.nn.regularizers.base import BaseRegularizer
 import numpy as np
 
 
-class L2(Regularizer):
+class L2(BaseRegularizer):
     """
-    L2 Regularizer Class
+    L2 Regularizer (also known as Ridge regularization).
     
-    The L2 Regularizer class implements L2 (Ridge) regularization. L2 regularization
-    discourages large weights in the model by adding the L2 norm (the square root of the 
-    sum of the squared weights) multiplied by the regularization factor lambda to the loss function.
+    L2 regularization adds a penalty equivalent to the square of the magnitude of coefficients. 
+    This results in shrinking the coefficients and it helps to prevent multicollinearity. 
+    L2 will not result in the elimination of coefficients, unlike L1 which can eliminate some coefficients.
     
-    L2 regularization can help prevent overfitting by discouraging overly complex models 
-    that fit the training data too closely.
+    Given a weight matrix `W`, the L2 regularization term is:
+    
+    L2 = lambda * sum(W^2)
+    
+    where:
+    - `lambda` is the regularization coefficient, determining the strength of the regularization.
+    - `sum(W^2)` is the sum of the squared values of the weights.
 
-    Parameters
-    ----------
-    lambda_val : float, optional
-        The regularization factor, default is set in the base `Regularizer` class.
+    Args:
+        lambda_val (float, optional): Regularization coefficient. Default value is set to 0.0001.
 
-    Methods
-    -------
-    forward(weights: np.array) -> float:
-        Compute the L2 regularization term for the given weights.
-    
-    backward(weights: np.array) -> np.array:
-        Compute and return the gradient of the L2 regularization term with respect to the weights.
-    
-    get_config() -> dict:
-        Returns a dictionary containing the configuration of the regularizer.
-
-    Example
-    -------
-    >>> l2_reg = L2(lambda_val=0.01)
-    >>> weights = np.array([1.0, -2.0, 3.0])
-    >>> print(l2_reg.forward(weights))  # Outputs: 0.14
-    >>> print(l2_reg.backward(weights)) # Outputs: [ 0.02 -0.04  0.06]
+    Attributes:
+        lambda_val (float): Regularization coefficient.
+        name (str): Name of the regularizer with its lambda value, useful for representation purposes.
     """
+
+
+    def __init__(self, lambda_val: float = 0.0001):
+        """
+        Initializes the L2 regularizer with a given regularization coefficient.
+
+        Args:
+            lambda_val (float, optional): Regularization coefficient.
+        """
+        super().__init__(lambda_val)
+        self.name = f"l2_{str(lambda_val)}"
 
 
     def forward(self, weights: np.array) -> np.array:
         """
-        Compute the L2 regularization term for the given weights.
+        Compute the L2 regularization cost for the given weights.
 
-        Parameters
-        ----------
-        weights : np.array
-            Weights of the model for which the L2 regularization term is computed.
+        Args:
+            weights (np.array): Weights of a neural network layer.
 
-        Returns
-        -------
-        float
-            The L2 regularization term for the given weights.
+        Returns:
+            float: L2 regularization cost for the given weights.
         """
         return self.lambda_val * np.sum(np.square(weights))
-    
+
     
     def backward(self, weights: np.array) -> np.array:
         """
-        Compute the gradient of the L2 regularization term with respect to the weights.
+        Compute the gradient of the L2 regularization cost with respect to the given weights.
 
-        Parameters
-        ----------
-        weights : np.array
-            Weights of the model for which the gradient is computed.
+        Args:
+            weights (np.array): Weights of a neural network layer.
 
-        Returns
-        -------
-        np.array
-            Gradient of the L2 regularization term with respect to the given weights.
+        Returns:
+            np.array: Gradient of the L2 regularization cost with respect to the given weights. It provides a scaled version of the weights by the regularization coefficient.
         """
         return self.lambda_val * 2 * weights
-
-
-    def get_config(self) -> dict:
-        """
-        Returns the configuration of the L2 regularizer.
-
-        Returns
-        -------
-        dict
-            A dictionary containing the regularization factor lambda.
-
-        Example
-        -------
-        >>> l2_reg = L2(lambda_val=0.01)
-        >>> config = l2_reg.get_config()
-        >>> print(config)
-        {'lambda_val': 0.01}
-        """
-        return {"lambda_val": self.lambda_val}

@@ -1,81 +1,55 @@
-from skynet_ml.nn.activations.activation import Activation
+from skynet_ml.nn.activations.base import BaseActivation
 import numpy as np
 
 
-class Linear(Activation):
+class Linear(BaseActivation):
     """
-    The Linear Activation function.
+    Linear activation function that calculates the identity function, i.e., f(x) = x.
 
-    The Linear function is an activation function that doesn’t modify the 
-    input values. It is also known as identity activation function. It is
-    mostly used in the output layer of a regression network.
+    This can be beneficial as the output activation function for regression problems or
+    as the output activation function for classification problems when from_logits=True 
+    for the loss function.
 
-    Attributes
-    ----------
-    name : str
-        Name of the activation function.
-
-    Methods
-    -------
-    get_config() -> dict
-        Retrieve the configuration of the activation function.
-    compute(z: np.array) -> np.array
-        Compute the forward pass of the Linear activation function.
-    gradient(z: np.array) -> np.array
-        Compute the gradient of the Linear activation with respect to its input.
-
-    Example
-    -------
-    >>> linear = Linear()
-    >>> input_array = np.array([[2, -1], [-3, 4]])
-    >>> output_array = linear.compute(input_array)
-    >>> gradient_array = linear.gradient(input_array)
+    Notes:
+        - It's essentially a pass-through and does not transform the input in any way.
+        - The gradient is always 1.
     """
     
     
     def __init__(self) -> None:
         """
-        Initialize the Linear object with the name attribute set to 'Linear'.
-        """
-        self.name = "Linear"
+        Initializes the activation function.
+        """        
+        self.name = "linear"
 
         
     def compute(self, z: np.array) -> np.array:
         """
-        Compute the forward pass of the Linear activation function.
+        Computes the activation for the given input array.
 
-        This function will return an array with the same shape as the input, 
-        essentially performing no operation on it.
+        Args:
+            z (np.array): Input array to the activation function. 
+                          Should have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
-
-        Returns
-        -------
-        np.array
-            The output of the Linear activation function, same as input `z`.
-        """
+        Returns:
+            np.array: The output, which is identical to the input.
+        """        
+        # Ensures the input has the correct shape
         self._check_shape(z)
         return z
     
     
     def gradient(self, z: np.array) -> np.array:
         """
-        Compute the gradient of the Linear activation with respect to its input.
+        Computes the gradient of the activation function for the given input array.
 
-        The gradient is one everywhere.
+        Args:
+            z (np.array): Input array to the activation function. 
+                          Should have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The input to the activation function.
-
-        Returns
-        -------
-        np.array
-            The gradient of the Linear activation with respect to its input `z`.
-        """
+        Returns:
+            np.array: The gradient, which is an array of ones with the same shape as the input.
+        """        
+        # Ensures the input has the correct shape
         self._check_shape(z)
         return np.ones_like(z)

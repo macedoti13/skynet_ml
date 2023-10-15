@@ -1,122 +1,72 @@
-from skynet_ml.nn.initializers.initializer import Initializer
+from skynet_ml.nn.initializers.base import BaseInitializer
 import numpy as np
 
 
-class HeNormal(Initializer):
+class HeNormal(BaseInitializer):
     """
-    He Normal weight initializer.
+    Initializes weights using the He normal initialization method.
 
-    Also known as He et al. initializer, this initialization method is designed to work with ReLU (rectified linear unit) 
-    activations by initializing weights with a standard deviation of `sqrt(2 / n)`, where `n` is the number of input 
-    units in the weight tensor.
+    The He normal initializer is designed for layers with the ReLU (and variants) activation functions.
+    It initializes the weights from a normal distribution with mean 0 and standard deviation sqrt(2 / n), 
+    where n is the number of input units in the weight tensor.
 
-    Parameters
-    ----------
-    None
-
-    Attributes
-    ----------
-    name : str
-        The name identifier of the initializer, set to 'He Normal'.
-
-    Methods
-    -------
-    get_config() -> dict
-        Returns an empty dictionary as there are no hyperparameters for this initializer.
-    initialize_weights(input_dim: int, n_units: int) -> np.array
-        Initializes and returns the weights with zero mean and a variance of 2/n.
-
-    Examples
-    --------
-    >>> initializer = HeNormal()
-    >>> weights = initializer.initialize_weights(5, 10)
+    Attributes:
+        name (str): Name representation for the initializer, useful for debugging and logging.
     """
-    
-    
+
+
     def __init__(self) -> None:
-        self.name = "He Normal"
-    
+        """
+        Initializes the He normal weight initializer.
+        """
+        self.name = "he_normal"
+
 
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         """
-        Initializes weights using the He Normal initialization.
+        Initializes the weights matrix using the He normal initialization method.
 
-        The weights are sampled from a normal distribution with mean zero and standard deviation `sqrt(2 / input_dim)`.
-        The size of the initialized weight matrix is determined by `input_dim` and `n_units` parameters.
+        Args:
+            input_dim (int): Number of input features or units from the previous layer.
+            n_units (int): Number of units in the current layer for which weights need to be initialized.
 
-        Parameters
-        ----------
-        input_dim : int
-            The dimensionality of the input data.
-        n_units : int
-            The number of units in the layer for which the weights are initialized.
-
-        Returns
-        -------
-        np.array
-            A 2D numpy array containing the initialized weights with a shape of (input_dim, n_units).
+        Returns:
+            np.array: Weight matrix of shape (input_dim, n_units) initialized with values drawn from the specified normal distribution.
         """
         std = np.sqrt(2.0 / input_dim)
         return np.random.normal(0.0, std, (input_dim, n_units))
 
 
-class HeUniform(Initializer):
+class HeUniform(BaseInitializer):
     """
-    He Uniform weight initializer.
+    Initializes weights using the He uniform initialization method.
 
-    Designed to keep the variance of the weights in each layer in a deep network with ReLU activations roughly the same.
-    It initializes the weights with values drawn from a uniform distribution within [-limit, limit], where limit is 
-    `sqrt(6 / n)` and `n` is the number of input units in the weight tensor.
+    The He uniform initializer is designed for layers with the ReLU (and variants) activation functions.
+    It initializes the weights from a uniform distribution within the range [-limit, limit], 
+    where limit is sqrt(6 / n) and n is the number of input units in the weight tensor.
 
-    Parameters
-    ----------
-    None
-
-    Attributes
-    ----------
-    name : str
-        The name identifier of the initializer, set to 'He Uniform'.
-
-    Methods
-    -------
-    get_config() -> dict
-        Returns an empty dictionary as there are no hyperparameters for this initializer.
-    initialize_weights(input_dim: int, n_units: int) -> np.array
-        Initializes and returns the weights using He Uniform initialization.
-
-    Examples
-    --------
-    >>> initializer = HeUniform()
-    >>> weights = initializer.initialize_weights(5, 10)
+    Attributes:
+        name (str): Name representation for the initializer, useful for debugging and logging.
     """
-    
-    
+
+
     def __init__(self) -> None:
         """
-        Initializes a `HeUniform` instance.
+        Initializes the He uniform weight initializer.
         """
-        self.name = "He Uniform"
-        
+        self.name = "he_uniform"
+
 
     def initialize_weights(self, input_dim: int, n_units: int) -> np.array:
         """
-        Initializes weights using He Uniform initialization.
+        Initializes the weights matrix using the He uniform initialization method.
 
-        The weights are sampled from a uniform distribution within the interval `[-limit, limit]` where the limit is 
-        `sqrt(6 / input_dim)`. The size of the initialized weight matrix is determined by `input_dim` and `n_units` 
-        parameters.
+        Args:
+            input_dim (int): Number of input features or units from the previous layer.
+            n_units (int): Number of units in the current layer for which weights need to be initialized.
 
-        Parameters
-        ----------
-        input_dim : int
-            The dimensionality of the input data.
-        n_units : int
-            The number of units in the layer for which the weights are initialized.
-
-        Returns
-        -------
-        np.array
-            A 2D numpy array containing the initialized weights with a shape of (input_dim, n_units).
+        Returns:
+            np.array: Weight matrix of shape (input_dim, n_units) initialized with values drawn from the specified uniform distribution.
         """
         limit = np.sqrt(6.0 / input_dim)
         return np.random.uniform(-limit, limit, (input_dim, n_units))

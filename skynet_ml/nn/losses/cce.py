@@ -1,115 +1,80 @@
-from skynet_ml.nn.losses.loss import Loss
 from skynet_ml.utils.factories import ActivationsFactory
+from skynet_ml.nn.losses.base import BaseLoss
 import numpy as np
 
 
-class CategoricalCrossEntropy(Loss):
+class CategoricalCrossEntropy(BaseLoss):
     """
-    Categorical Cross Entropy (CCE) Loss Class
+    Implements the Categorical Cross-Entropy (CCE) loss function.
     
-    This class is used for multi-class classification problems. It computes the average negative log likelihood
-    between the true class labels (in one-hot encoded format) and the predicted probabilities. The `compute` method
-    calculates the loss, while the `gradient` method computes the gradient of the loss with respect to the predictions.
+    CCE is used for multi-class classification tasks. It quantifies the difference between two probability distributions:
+    the true label distribution and the predicted label distribution.
+    
+    Mathematically, for true labels y_true and predicted probabilities y_pred, it is defined as:
 
-    When `from_logits=True`, it assumes that the predicted values (y_hat) are logits (i.e., the output of a linear layer),
-    and applies a softmax function to convert them into probabilities. Therefore, when `from_logits=True`, the network's
-    output layer MUST be a linear layer, since the softmax function is applied inside the loss function. If `from_logits`
-    is set to True and the network's output layer is softmax, the softmax function would be applied twice, leading to 
-    incorrect results.
+        CCE = -Σ [y_true * log(y_pred)]
 
-    When `from_logits=False`, it assumes `y_hat` are probabilities, thus, it expects the network's output layer to be 
-    softmax to ensure that the predictions are probabilities. Note that the gradient simplification `y_hat - y_true` 
-    is valid only when using softmax as the activation function in the output layer due to the derivative properties of 
-    softmax combined with CCE.
+    Notes:
+        - The output values of y_pred for each sample should sum up to 1.
+        - CCE will be high if the predicted probabilities diverge from the true labels and low if they are close.
+        - Like Binary Cross-Entropy, it is sensitive to the confidence of the predictions.
 
-    Methods
-    -------
-    compute(y_true: np.array, y_hat: np.array) -> float:
-        Computes the categorical cross entropy loss.
-
-    gradient(y_true: np.array, y_hat: np.array) -> np.array:
-        Computes the gradient of the categorical cross entropy loss with respect to the predictions.
+    Args:
+        from_logits (bool): If True, the predicted values are expected to be logits and will be passed through the softmax activation.
+                            If False, they are expected to sum up to 1 for each sample. Default is True.
     """
-     
-     
+    
+    
     def __init__(self, from_logits: bool = True) -> None:
         """
-        Initialize the Categorical Cross Entropy Loss object.
-        
-        Parameters
-        ----------
-        from_logits : bool, optional
-            Flag to denote whether the network's output is logits or probabilities. 
-            - True: expects logits and applies softmax function to convert logits to probabilities.
-            - False: expects probabilities, assumes network's output layer is softmax. 
-            Default is True.
+        Initializes the loss function with its name and the `from_logits` parameter.
         """
         self.from_logits = from_logits
-        self.name = "categorical_crossentropy"
+        self.name = f"categorical_crossentropy_{str(from_logits)}"
         
-    
-    def compute(self, y_true: np.array, y_hat: np.array) -> float:
+        
+    def compute(self, y_true: np.array, y_pred: np.array) -> float:
         """
-        Compute the Categorical Cross Entropy loss between true and predicted values.
-        
-        Parameters
-        ----------
-        y_true : np.array
-            True class labels in one-hot encoded format.
-        y_hat : np.array
-            Predicted class logits or probabilities, based on the `from_logits` flag.
+        Computes the Categorical Cross-Entropy loss for the given true labels and predicted probabilities.
 
-        Returns
-        -------
-        float
-            The computed Categorical Cross Entropy loss.
+        Args:
+            y_true (np.array): Ground truth labels in one-hot encoded format. 
+                               Expected to be a 2D array with shape (batch_size, num_classes).
+            y_pred (np.array): Predicted probabilities from the model. Expected to have the same shape as y_true.
+
+        Returns:
+            float: The computed Categorical Cross-Entropy loss.
         """
-        self._check_shape(y_true, y_hat)
+        self._check_shape(y_true, y_pred)
         
         if self.from_logits:
             softmax = ActivationsFactory().get_object("softmax")
-            y_hat = softmax.compute(y_hat)
+            y_pred = softmax.compute(y_pred)
             
         epsilon = 1e-7
-        y_hat = np.clip(y_hat, epsilon, 1 - epsilon)
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
         
-        return -np.mean(np.sum(y_true * np.log(y_hat), axis=1, keepdims=True))
+        return -np.mean(np.sum(y_true * np.log(y_pred), axis=1, keepdims=True))
     
     
-    def gradient(self, y_true: np.array, y_hat: np.array) -> np.array:
+    def gradient(self, y_true: np.array, y_pred: np.array) -> np.array:
         """
-        Compute the gradient of the Categorical Cross Entropy loss with respect to predictions.
-        
-        Parameters
-        ----------
-        y_true : np.array
-            True class labels in one-hot encoded format.
-        y_hat : np.array
-            Predicted class logits or probabilities, based on the `from_logits` flag.
-            
-        Returns
-        -------
-        np.array
-            Gradient of the Categorical Cross Entropy loss with respect to predictions.
+        Computes the gradient of the Categorical Cross-Entropy loss with respect to the predicted probabilities.
+
+        Args:
+            y_true (np.array): Ground truth labels in one-hot encoded format. 
+                               Expected to be a 2D array with shape (batch_size, num_classes).
+            y_pred (np.array): Predicted probabilities from the model. Expected to have the same shape as y_true.
+
+        Returns:
+            np.array: Gradient of the loss with respect to the predicted probabilities. Expected to have the same shape as y_pred.
         """
-        self._check_shape(y_true, y_hat)
+        self._check_shape(y_true, y_pred)
     
         if self.from_logits:
             softmax = ActivationsFactory().get_object("softmax")
-            y_hat = softmax.compute(y_hat)
+            y_pred = softmax.compute(y_pred)
         
         epsilon = 1e-7
-        y_hat = np.clip(y_hat, epsilon, 1 - epsilon)
-        return y_hat - y_true
-
-
-    def get_config(self) -> dict:
-        """
-        Get the configuration of the categorical cross loss.
-
-        Returns
-        -------
-        dict
-            The configuration of the categorical cross entropy loss.
-        """
-        return {"from_logits": self.from_logits}
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+        return y_pred - y_true

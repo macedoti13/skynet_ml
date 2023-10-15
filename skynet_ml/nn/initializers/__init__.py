@@ -1,39 +1,26 @@
-from skynet_ml.nn.initializers.constant import Constant
-from skynet_ml.nn.initializers.normal import Normal
-from skynet_ml.nn.initializers.uniform import Uniform
 from skynet_ml.nn.initializers.xavier import XavierNormal, XavierUniform
 from skynet_ml.nn.initializers.he import HeNormal, HeUniform
+from skynet_ml.nn.initializers.constant import Constant
+from skynet_ml.nn.initializers.uniform import Uniform
+from skynet_ml.nn.initializers.normal import Normal
 
 
-INITIALIZERS_MAP = {
+initializers_map = {
     "constant": Constant,
-    "Constant": Constant,
     "normal": Normal,
-    "Normal": Normal,
     "uniform": Uniform,
-    "Uniform": Uniform,
     "xavier_normal": XavierNormal,
     "xavier_uniform": XavierUniform,
-    "Xavier Normal": XavierUniform,
-    "Xavier Uniform": XavierUniform,
     "he_normal": HeNormal,
-    "He Normal": HeNormal,
-    "He Uniform": HeUniform,
     "he_uniform": HeUniform
 }
 
 
-ACTIVATIONS_INITIALIZER_MAP = {
+activations_initializers_map = {
     'relu': 'he_normal',
-    'ReLU': 'he_normal',
     'leaky_relu': 'he_normal',
-    'LeakyReLU': 'he_normal',
     'sigmoid': 'xavier_normal',
-    'Sigmoid': 'xavier_normal',
     'tanh': 'xavier_normal',
-    'Tanh': 'xavier_normal',
     'softmax': 'xavier_uniform',
-    'Softmax': 'xavier_uniform',
     'linear': 'xavier_normal',
-    'Linear': 'xavier_normal'
 }

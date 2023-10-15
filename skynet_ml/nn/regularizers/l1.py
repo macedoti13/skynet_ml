@@ -1,90 +1,64 @@
-from skynet_ml.nn.regularizers.regularizer import Regularizer
+from skynet_ml.nn.regularizers.base import BaseRegularizer
 import numpy as np
 
 
-class L1(Regularizer):
+class L1(BaseRegularizer):
     """
-    L1 Regularizer Class
+    L1 Regularizer (also known as Lasso regularization).
     
-    This class implements L1 regularization, which helps to encourage sparsity
-    in the model parameters (weights). It's particularly useful for feature selection.
+    L1 regularization adds a penalty equivalent to the absolute value of the magnitude of coefficients. 
+    It can lead to zero coefficients i.e. some of the features are completely neglected for the evaluation of output. 
+    Thus, L1 can also be seen as a method for feature selection.
     
-    L1 regularization adds the L1 norm of weights (the sum of the absolute values of
-    the weights) multiplied by the regularization factor lambda to the loss function.
+    Given a weight matrix `W`, the L1 regularization term is:
+    
+    L1 = lambda * sum(|W|)
+    
+    where:
+    - `lambda` is the regularization coefficient, determining the strength of the regularization.
+    - `sum(|W|)` is the sum of the absolute values of the weights.
 
-    Parameters
-    ----------
-    lambda_val : float, optional
-        The regularization factor, default is set in the base `Regularizer` class.
+    Args:
+        lambda_val (float, optional): Regularization coefficient. Default value is set to 0.0001.
 
-    Methods
-    -------
-    forward(weights: np.array) -> float:
-        Compute the L1 regularization term for the given weights.
-    
-    backward(weights: np.array) -> np.array:
-        Compute and return the gradient of the L1 regularization term with respect to the weights.
-    
-    get_config() -> dict:
-        Returns a dictionary containing the configuration of the regularizer.
-
-    Example
-    -------
-    >>> l1_reg = L1(lambda_val=0.01)
-    >>> weights = np.array([1.0, -2.0, 3.0])
-    >>> print(l1_reg.forward(weights))  # Outputs: 0.06
-    >>> print(l1_reg.backward(weights)) # Outputs: [ 0.01 -0.01  0.01]
+    Attributes:
+        lambda_val (float): Regularization coefficient.
+        name (str): Name of the regularizer with its lambda value, useful for representation purposes.
     """
+
+
+    def __init__(self, lambda_val: float = 0.0001):
+        """
+        Initializes the L1 regularizer with a given regularization coefficient.
+
+        Args:
+            lambda_val (float, optional): Regularization coefficient.
+        """
+        super().__init__(lambda_val)
+        self.name = f"l1_{str(lambda_val)}"
 
 
     def forward(self, weights: np.array) -> np.array:
         """
-        Compute the L1 regularization term for the given weights.
+        Compute the L1 regularization cost for the given weights.
 
-        Parameters
-        ----------
-        weights : np.array
-            Weights of the model for which the L1 regularization term is computed.
+        Args:
+            weights (np.array): Weights of a neural network layer.
 
-        Returns
-        -------
-        float
-            The L1 regularization term for the given weights.
+        Returns:
+            float: L1 regularization cost for the given weights.
         """
         return self.lambda_val * np.sum(np.abs(weights))
-    
+
     
     def backward(self, weights: np.array) -> np.array:
         """
-        Compute the gradient of the L1 regularization term with respect to the weights.
+        Compute the gradient of the L1 regularization cost with respect to the given weights.
 
-        Parameters
-        ----------
-        weights : np.array
-            Weights of the model for which the gradient is computed.
+        Args:
+            weights (np.array): Weights of a neural network layer.
 
-        Returns
-        -------
-        np.array
-            Gradient of the L1 regularization term with respect to the given weights.
+        Returns:
+            np.array: Gradient of the L1 regularization cost with respect to the given weights. It provides the sign of weights scaled by the regularization coefficient.
         """
         return self.lambda_val * np.sign(weights)
-
-
-    def get_config(self) -> dict:
-        """
-        Returns the configuration of the L1 regularizer.
-
-        Returns
-        -------
-        dict
-            A dictionary containing the regularization factor lambda.
-
-        Example
-        -------
-        >>> l1_reg = L1(lambda_val=0.01)
-        >>> config = l1_reg.get_config()
-        >>> print(config)
-        {'lambda_val': 0.01}
-        """
-        return {"lambda_val": self.lambda_val}

@@ -1,65 +1,36 @@
-from skynet_ml.nn.activations.activation import Activation
+from skynet_ml.nn.activations.base import BaseActivation
 import numpy as np
 
 
-class Softmax(Activation):
+class Softmax(BaseActivation):
     """
-    The Softmax Activation Function.
+    Computes the softmax function, f(x) = exp(x) / sum(exp(x)).
+    
+    Notes:
+        - It squashes the input to the range [0, 1]. Larger values are closer to 1 and smaller values are closer to 0.
+        - Acts as a multi-class version of the sigmoid function.
+        - Functions as a probability distribution over the classes.
+            - Acts in the entire output layer of a neural network. It gives the probability of each class that sums to 1.
+    """    
 
-    Softmax is often used as the activation for the last layer of a classification 
-    network because the result could be interpreted as a probability distribution.
-
-    The Softmax function outputs a vector that represents the probability distributions 
-    of a list of potential outcomes. It is a type of sigmoid function and is used 
-    in various multiclass classification methods.
-
-    Attributes
-    ----------
-    name : str
-        Name of the activation function.
-
-    Methods
-    -------
-    get_config() -> dict
-        Retrieve the configuration of the activation function.
-    compute(z: np.array) -> np.array
-        Compute the forward pass of the Softmax activation function.
-    gradient(z: np.array) -> np.array
-        Compute the gradient of the Softmax activation with respect to its input.
-
-    Example
-    -------
-    >>> softmax_activation = Softmax()
-    >>> input_array = np.array([[2, -1], [-3, 4]])
-    >>> output_array = softmax_activation.compute(input_array)
-    >>> gradient_array = softmax_activation.gradient(input_array)
-    """
-
-
+    
     def __init__(self) -> None:
         """
-        Initialize the Softmax object with the name attribute set to 'Softmax'.
-        """
-        self.name = "Softmax"
+        Initializes the activation function.
+        """        
+        self.name = "softmax"
         
 
     def compute(self, z: np.array) -> np.array:
         """
-        Compute the forward pass of the Softmax activation function.
+        Computes the softmax activation for the given input array.
 
-        Softmax function converts the raw logits into probabilities by taking the 
-        exponential of each class score and then normalizing it.
+        Args:
+            z (np.array): The input array to the activation function. Expected to have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The raw logits or input to the activation function.
-
-        Returns
-        -------
-        np.array
-            The probabilities after applying Softmax.
-        """
+        Returns:
+            np.array: The activated output, with values normalized to represent probabilities in the range [0, 1].
+        """        
         self._check_shape(z)
         exps = np.exp(z - np.max(z, axis=1, keepdims=True))  # Subtracting the max for numerical stability
         return exps / np.sum(exps, axis=1, keepdims=True)
@@ -67,22 +38,18 @@ class Softmax(Activation):
     
     def gradient(self, z: np.array) -> np.array:
         """
-        Compute the gradient of the Softmax activation with respect to its input.
+        This method doesn't provide the true gradient of the softmax function. 
+        The actual gradient would be a Jacobian matrix of shape (n_units, n_units).
+        In the context of neural networks, when combined with the cross entropy loss, 
+        the gradient simplifies to (yhat - y). Hence, for simplicity and specific applications,
+        this function returns a vector of ones, which when multiplied by (yhat - y) gives the desired gradient. 
+        Note: This might not be applicable for all use cases.
 
-        Note: When Softmax is used in conjunction with Cross Entropy loss during backpropagation,
-        the derivative simplifies to (prediction - target). Therefore, it's recommended
-        to use Cross Entropy loss for training the network when Softmax is used.
+        Args:
+            z (np.array): The input array to the activation function. Expected to have a shape (batch_size, n_units).
 
-        Parameters
-        ----------
-        z : np.array
-            The raw logits or input to the activation function.
-
-        Returns
-        -------
-        np.array
-            Ones-like array with the same shape as input `z`. The actual computation of the gradient 
-            should be handled during the backpropagation process considering the loss function used.
-        """
+        Returns:
+            np.array: A vector of ones with the same shape as the input.
+        """        
         self._check_shape(z)
-        return np.ones_like(z)  # When combined with cross entropy, uses yhat - y simplification.
+        return np.ones_like(z)  # Used in combination with cross entropy's (yhat - y) simplification.

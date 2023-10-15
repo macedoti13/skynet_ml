@@ -2,46 +2,55 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple
 import numpy as np
 
+
 class MiniBatchCreator(ABC):
     """
-    Abstract base class defining the interface for creating mini-batches from data.
+    Abstract base class for mini-batch creation. Provides a blueprint for creating mini-batches from datasets.
+
+    Derived classes should implement the 'create' method to return mini-batches from the input data.
     """
+
 
     @abstractmethod
     def create(self, X: np.array, y: np.array, batch_size: int) -> List[Tuple[np.array, np.array]]:
         """
-        Abstract method to create mini-batches from the provided data.
+        Create mini-batches from the given dataset.
 
-        Parameters:
-        - X (np.array): Input data.
-        - y (np.array): Ground truth labels.
-        - batch_size (int): Desired size of each mini-batch.
+        Args:
+            X (np.array): Feature matrix.
+            y (np.array): Target vector or matrix.
+            batch_size (int): Size of each mini-batch.
 
         Returns:
-        - List[Tuple[np.array, np.array]]: List of tuples, where each tuple contains a mini-batch of data 
-                                           and corresponding labels.
+            List[Tuple[np.array, np.array]]: List of mini-batches where each mini-batch is a tuple of (X_mini, y_mini).
         """
         pass
-    
-    
+
+
 class DefaultMiniBatchCreator(MiniBatchCreator):
     """
-    Default implementation for creating mini-batches from data.
+    Default implementation of the MiniBatchCreator. Creates mini-batches by shuffling the input data and then 
+    splitting it based on the specified batch size.
+
+    This class uses a static method to ensure that no instance is needed to create mini-batches.
     """
+
 
     @staticmethod
     def create(X: np.array, y: np.array, batch_size: int) -> List[Tuple[np.array, np.array]]:
         """
-        Create mini-batches from the provided data.
+        Create mini-batches from the given dataset using the default shuffling and splitting method.
 
         Args:
-        - X (np.array): Input data.
-        - y (np.array): True labels.
-        - batch_size (int): Desired size of each mini-batch.
+            X (np.array): Feature matrix.
+            y (np.array): Target vector or matrix.
+            batch_size (int): Size of each mini-batch.
+
+        Raises:
+            AssertionError: If the number of samples in X and y do not match.
 
         Returns:
-        - mini_batches (List[Tuple[np.array, np.array]]): List of tuples, where each tuple contains a mini-batch 
-                                                          of data and corresponding labels.
+            List[Tuple[np.array, np.array]]: List of mini-batches where each mini-batch is a tuple of (X_mini, y_mini).
         """
         
         assert X.shape[0] == y.shape[0], "Mismatch between the number of samples in X and y."

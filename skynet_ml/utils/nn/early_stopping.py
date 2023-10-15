@@ -1,37 +1,28 @@
 class EarlyStopping:
     """
-    Implements the early stopping mechanism to prevent overfitting during training.
+    Early stopping utility.
 
-    Attributes
-    ----------
-    patience : int
-        Number of epochs with no improvement after which training will be stopped.
-    min_delta : float
-        Minimum change in the monitored quantity to qualify as an improvement.
-    wait : int
-        Number of epochs that have been waited without improvement.
-    best_loss : float
-        Best observed loss value.
+    This utility checks for improvement in a given metric (usually validation loss) and stops the training process if 
+    no improvement is observed for a specified number of iterations (patience). It is often used to prevent overfitting 
+    and potentially save computational resources.
 
-    Methods
-    -------
-    should_stop(current_loss: float) -> bool:
-        Checks if early stopping conditions are met based on the provided loss value.
+    Attributes:
+        patience (int): Number of epochs with no improvement after which training will be stopped.
+        min_delta (float): Minimum change in the monitored quantity to qualify as an improvement.
+        wait (int): Current number of epochs with no improvement.
+        best_loss (float): The best (lowest) value of the loss observed so far.
     """
-    
-    
+
+
     def __init__(self, patience: int = 10, min_delta: float = 0.00001):
         """
-        Initializes the early stopping object with the given patience and delta values.
+        Initialize the EarlyStopping utility.
 
-        Parameters
-        ----------
-        patience : int, optional
-            Number of epochs with no improvement after which training will be stopped.
-            Default is 5.
-        min_delta : float, optional
-            Minimum change in the monitored quantity to qualify as an improvement.
-            Default is 0.001.
+        Args:
+            patience (int, optional): Number of epochs with no improvement after which training will be stopped. 
+                                      Defaults to 10.
+            min_delta (float, optional): Minimum change in the monitored quantity to qualify as an improvement. 
+                                         Defaults to 0.00001.
         """
         self.patience = patience
         self.min_delta = min_delta
@@ -41,18 +32,15 @@ class EarlyStopping:
 
     def should_stop(self, current_loss: float) -> bool:
         """
-        Checks if early stopping conditions are met based on the provided loss value.
+        Check if the training process should be halted based on the current loss.
 
-        Parameters
-        ----------
-        current_loss : float
-            The current loss value to be compared with the best observed loss.
+        Args:
+            current_loss (float): The current value of the loss.
 
-        Returns
-        -------
-        bool
-            True if the training should be stopped early, otherwise False.
+        Returns:
+            bool: True if the training process should be halted, False otherwise.
         """
+        
         if current_loss < self.best_loss - self.min_delta:
             self.best_loss = current_loss
             self.wait = 0
@@ -61,4 +49,5 @@ class EarlyStopping:
             
         if self.wait >= self.patience:
             return True
+        
         return False

@@ -1,57 +1,44 @@
-from skynet_ml.nn.optimizers.optimizer import Optimizer
-from skynet_ml.nn.layers.layer import Layer
+from skynet_ml.nn.optimizers.base import BaseOptimizer
+from skynet_ml.nn.layers.base import BaseLayer
 
-class SGD(Optimizer):
+class SGD(BaseOptimizer):
     """
-    Stochastic Gradient Descent (SGD) optimization algorithm.
+    Stochastic Gradient Descent (SGD) optimizer.
 
-    SGD is an iterative method to optimize the objective function with suitable smoothness 
-    properties. This optimizer updates each parameter of the model in the opposite direction 
-    of the gradient of the objective function with respect to that parameter, scaled by 
-    the learning rate. Proper use of SGD can lead to faster convergence compared to other 
-    optimization techniques.
-
-    Inherits from:
-    Optimizer: Base class for optimization algorithms.
-
-    Attributes
-    ----------
-    - learning_rate : float
-        The step size used when following the negative gradient during training.
-
-    Methods
-    -------
-    - update(layer: Layer) -> None:
-        Updates the weights and biases of the provided layer using the SGD optimization 
-        algorithm.
-
-    - step(layers: list) -> None:
-        Updates the weights and biases for each layer in the list using the SGD optimization 
-        algorithm.
-    """
+    SGD is a simple yet effective optimization algorithm used to minimize the loss 
+    function in iterative manners. It updates the network's parameters (weights and biases) 
+    in the opposite direction of the gradient.
+    """    
     
     
-    def update(self, layer: Layer) -> None:
+    def __init__(self, learning_rate: float = 0.01) -> None:
         """
-        Updates the weights of the provided layer using the SGD optimization algorithm.
+        Initializes the SGD optimizer with a specified learning rate.
 
-        Parameters:
-        - layer (Layer): The layer whose weights and biases need to be updated.
+        Args:
+            learning_rate (float, optional): The step size used to update the parameters 
+            during training. Defines how large the updates to the weights/biases will be 
+            on each iteration. Defaults to 0.01.
+        """        
+        super().__init__(learning_rate)
+        self.name = "sgd"
 
-        Note:
-        If the layer has biases, they will be updated as well.
+
+    def update(self, layer: BaseLayer) -> None:
         """
+        Performs a parameter update using the computed gradients.
+
+        Adjusts the weights and biases (if present) of the given layer using the 
+        simple SGD formula.
+
+        Args:
+            layer (BaseLayer): The neural network layer whose parameters (weights and biases) 
+            need to be updated based on the computed gradients.
+        """
+        
+        # updating the weights
         layer.weights -= self.learning_rate * layer.d_weights
         
+        # updating the bias
         if layer.has_bias:
             layer.bias -= self.learning_rate * layer.d_bias
-
-
-    def get_config(self) -> dict:
-        """
-        Returns a dictionary containing the configuration of the optimizer.
-
-        Returns:
-        - config (dict): Configuration of the optimizer.
-        """
-        return {'learning_rate': self.learning_rate}

@@ -1,13 +1,13 @@
-from skynet_ml.nn.losses.bce import BinaryCrossEntropy
 from skynet_ml.nn.losses.cce import CategoricalCrossEntropy
+from skynet_ml.nn.losses.bce import BinaryCrossEntropy
 from skynet_ml.nn.losses.mse import MeanSquaredError
 
 
-LOSSES_MAP = {
-    "binary_crossentropy": BinaryCrossEntropy,
-    "bce": BinaryCrossEntropy,
+losses_map = {
     "categorical_crossentropy": CategoricalCrossEntropy,
-    "cce": CategoricalCrossEntropy,
+    "binary_crossentropy": BinaryCrossEntropy,
     "mean_squared_error": MeanSquaredError,
+    "cce": CategoricalCrossEntropy,
+    "bce": BinaryCrossEntropy,
     "mse": MeanSquaredError
 }
