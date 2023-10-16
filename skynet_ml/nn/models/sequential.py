@@ -433,7 +433,8 @@ class Sequential:
         
         
         if metrics:
-            metrics = self.fix_task_type([MetricsFactory().get_object(metric) for metric in metrics]) 
+            metrics = [MetricsFactory().get_object(metric) for metric in metrics] if metrics else None
+            self.fix_task_type(metrics) if metrics else None
             for metric in metrics:
                 metric_value = metric.compute(y, y_hat)
                 metrics_dict[metric.name] = metric_value

@@ -1,7 +1,7 @@
+kaleido
 numpy
 joblib
 pandas
 plotly
 matplotlib
 seabron
-kaleido
