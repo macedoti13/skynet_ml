@@ -363,12 +363,10 @@ class Sequential:
             self.print_epoch_info(i, epochs)
             all_data.append(self.get_epoch_info_as_dict(i))
             
-            
             # Save training history to csv file
             if save_training_history_in:
                 df = pd.DataFrame(all_data)
-                df.to_csv(save_training_history_in, index=False)
-                
+                df.to_csv(save_training_history_in, index=False)    
             
             # Save activations 
             if save_activations_in:
@@ -406,14 +404,15 @@ class Sequential:
         if save_gradients_in:
             with open(save_gradients_in, "w") as f:
                 json.dump(dict_of_gradients, f)
+                    
+        # Save best weights
+        self.set_weights(self.best_weights)
         
         
     def predict(self, x: np.array, one_hotted_output: bool = False, threshold: float = 0.5) -> np.array:
         """
         Predicts the output of the model.
         """        
-        y_pred = self.forward(x)
-        
         if one_hotted_output:
             if "binary_crossentropy" in str(self.loss.name):
                 y_pred = (y_pred > threshold).astype(int)
@@ -437,7 +436,7 @@ class Sequential:
             self.fix_task_type(metrics) if metrics else None
             for metric in metrics:
                 metric_value = metric.compute(y, y_hat)
-                metrics_dict[metric.name] = metric_value
+                metrics_dict[f"val_{metric.name.split('_')[0]}"] = metric_value
                 
         return metrics_dict
     

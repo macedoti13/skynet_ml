@@ -4,19 +4,17 @@ from skynet_ml.metrics.base import BaseMetric
 import numpy as np
 
 
-
 class FScore(BaseMetric):
     """
     F-score metric for classification tasks.
     """    
    
+   
     def __init__(self, threshold: float = 0.5, task_type: str = "binary", f: int = 1) -> None:
         """
         Initialize the metric.
         """
-        
-        self.precision = Precision(threshold=threshold, task_type=task_type)
-        self.recall = Recall(threshold=threshold, task_type=task_type)
+        self.threshold = threshold
         self.task_type = task_type
         self.f = f
         self.name = f"fscore_{str(threshold)}_{str(task_type)}_{str(f)}"
@@ -26,6 +24,8 @@ class FScore(BaseMetric):
         """
         Computes the F-score of the predictions.
         """        
+        self.precision = Precision(threshold=self.threshold, task_type=self.task_type)
+        self.recall = Recall(threshold=self.threshold, task_type=self.task_type)
         
         precision = self.precision.compute(y_true=y_true, y_pred=y_pred)
         recall = self.recall.compute(y_true=y_true, y_pred=y_pred)
