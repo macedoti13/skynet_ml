@@ -398,12 +398,14 @@ class Sequential:
                     break
                 
         # Save activations to json file
-        with open(save_activations_in, "w") as f:
-            json.dump(dict_of_activations, f)
+        if save_activations_in:
+            with open(save_activations_in, "w") as f:
+                json.dump(dict_of_activations, f)
             
         # Save gradients to json file
-        with open(save_gradients_in, "w") as f:
-            json.dump(dict_of_gradients, f)
+        if save_gradients_in:
+            with open(save_gradients_in, "w") as f:
+                json.dump(dict_of_gradients, f)
         
         
     def predict(self, x: np.array, one_hotted_output: bool = False, threshold: float = 0.5) -> np.array:

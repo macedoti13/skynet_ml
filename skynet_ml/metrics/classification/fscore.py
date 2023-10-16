@@ -28,8 +28,8 @@ class FScore(BaseMetric):
         Computes the F-score of the predictions.
         """        
         
-        precision = self.precision.compute(y_true=y_true, y_pred=y_pred)
-        recall = self.recall.compute(y_true=y_true, y_pred=y_pred)
+        precision = self.precision.compute(y_true=y_true, y_pred=y_pred, task_type=self.task_type)
+        recall = self.recall.compute(y_true=y_true, y_pred=y_pred, task_type=self.task_type)
         denominator = ((self.f**2 * precision) + recall)
         
         return np.round((1 + self.f**2) * ((precision * recall)) / denominator, decimals=4) if denominator != 0 else 0
