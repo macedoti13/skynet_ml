@@ -413,6 +413,8 @@ class Sequential:
         """
         Predicts the output of the model.
         """        
+        y_pred = self.forward(x)
+        
         if one_hotted_output:
             if "binary_crossentropy" in str(self.loss.name):
                 y_pred = (y_pred > threshold).astype(int)
