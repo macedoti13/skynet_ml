@@ -1,7 +1,7 @@
-from skynet_ml.utils.factories import ActivationsFactory, InitializersFactory
-import joblib
-import pandas as pd
 import plotly.graph_objects as go
+import pandas as pd
+import joblib
+import kaleido
 
 
 def load_model(filename: str):
@@ -15,7 +15,6 @@ def load_model(filename: str):
         model: The loaded machine learning model.
     """
     return joblib.load(filename)
-    
 
 
 def save_model(model, filename: str) -> None:
@@ -27,7 +26,6 @@ def save_model(model, filename: str) -> None:
         filename (str): Path to the file where the model will be saved.
     """
     joblib.dump(model, filename)
-    
     
     
 def plot_model(model, save_in=None):
@@ -74,7 +72,6 @@ def plot_model(model, save_in=None):
         print(output_str)
     else:
         print(output_str)
-        
         
         
 def plot_training_history(file_name, save_in=None):
