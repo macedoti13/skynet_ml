@@ -85,8 +85,8 @@ class Dense(BaseLayer):
         Args:
             weights (dict): A dictionary containing the weights ('weights' key) and biases ('bias' key) to be set for the dense layer.
         """
-        self.weights = weights["weights"]
-        self.bias = weights["bias"]
+        self.weights = weights["weights"].copy()
+        self.bias = weights["bias"].copy()
     
     
     def get_config(self) -> dict:

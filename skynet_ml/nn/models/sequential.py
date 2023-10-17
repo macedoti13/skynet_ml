@@ -10,6 +10,7 @@ from typing import Optional, Union, List
 import pandas as pd
 import numpy as np
 import json
+import copy
 
 
 class Sequential:
@@ -116,7 +117,7 @@ class Sequential:
             return
         
         if self.current_loss < self.best_loss:
-            self.best_weights = self.get_weights()
+            self.best_weights = copy.deepcopy(self.get_weights())
             self.best_loss = self.current_loss
             
         self.weights_updated = False
